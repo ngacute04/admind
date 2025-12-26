@@ -1,8 +1,4 @@
-#!/bin/bash
-# =============================================
-# Git Dev → Main + Tag (Đơn giản)
-# Chạy từng lệnh trong terminal
-# =============================================
+
 
 # --- 1️⃣ Chuyển sang develop và cập nhật ---
 git checkout develop
@@ -24,7 +20,3 @@ git push origin main           # Push main lên GitHub
 # --- 5️⃣ Tag version (nếu muốn) ---
 git tag -a v1.0.0 -m "Release v1.0.0"   # Thay version phù hợp
 git push origin --tags
-
-# =============================================
-# ✅ Hoàn tất: develop → main + tag
-# =============================================
