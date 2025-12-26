@@ -1,3 +1,4 @@
+#!/bin/bash
 
 
 # --- 1️⃣ Chuyển sang develop và cập nhật ---
