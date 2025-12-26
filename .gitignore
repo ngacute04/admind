@@ -1,0 +1,42 @@
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Maven
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Gradle / NetBeans
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+.nb-gradle/
+nbbuild/
+nbdist/
+dist/
+nbproject/private/
+
+# STS (Spring Tool Suite)
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# IntelliJ IDEA
+.idea
+*.iws
+*.iml
+*.ipr
+
+# Environment
+.env
+
+# HELP file
+HELP.md
