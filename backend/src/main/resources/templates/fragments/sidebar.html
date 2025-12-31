@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<aside th:fragment="sidebar"
+       class="w-72 bg-slate-900 text-white flex-shrink-0 hidden lg:flex flex-col shadow-2xl">
+
+    <!-- LOGO -->
+    <div class="p-6 flex items-center space-x-3 border-b border-slate-800">
+        <div class="bg-blue-600 p-2 rounded-lg">
+            <i class="fas fa-bolt"></i>
+        </div>
+        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
+            Admin Manager
+        </span>
+    </div>
+
+    <!-- MENU -->
+    <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto sidebar-scroll">
+        <p class="text-[10px] uppercase font-bold text-slate-500 px-3 mb-2 tracking-widest">Cơ bản</p>
+        <a href="/admin" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white">
+            <i class="fas fa-th-large w-5"></i>
+            <span>Bảng điều khiển</span>
+        </a>
+
+        <p class="text-[10px] uppercase font-bold text-slate-500 px-3 mt-6 mb-2 tracking-widest">Quản lý Cộng đồng</p>
+        <a href="/admin/users" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white">
+            <i class="fas fa-user-friends w-5"></i>
+            <span>Người dùng & Log</span>
+        </a>
+        <a href="/admin/contents" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white">
+            <i class="fas fa-photo-video w-5"></i>
+            <span>Bài viết & Media</span>
+        </a>
+        <a href="/admin/reports" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white">
+            <i class="fas fa-flag w-5"></i>
+            <span class="flex-1">Báo cáo vi phạm</span>
+            <span class="bg-red-500 text-[10px] px-2 py-0.5 rounded-full">12</span>
+        </a>
+
+        <p class="text-[10px] uppercase font-bold text-slate-500 px-3 mt-6 mb-2 tracking-widest">Kinh doanh & Quảng cáo</p>
+        <a href="/admin/marketplace" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white">
+            <i class="fas fa-store w-5"></i>
+            <span>Marketplace & Dự án</span>
+        </a>
+        <a href="/admin/ads" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white">
+            <i class="fas fa-ad w-5"></i>
+            <span>Chiến dịch Ads</span>
+        </a>
+
+        <p class="text-[10px] uppercase font-bold text-slate-500 px-3 mt-6 mb-2 tracking-widest">Hệ thống</p>
+        <a href="/admin/settings" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white">
+            <i class="fas fa-cog w-5"></i>
+            <span>Cấu hình & Bảo mật</span>
+        </a>
+    </nav>
+
+    <!-- USER -->
+    <div class="p-4 bg-slate-950 border-t border-slate-800">
+        <a th:href="@{/profile}" class="block">
+            <div class="flex items-center justify-between bg-slate-900 p-3 rounded-2xl hover:bg-slate-800 transition cursor-pointer">
+                <div class="flex items-center space-x-3">
+                    <img th:src="@{'https://ui-avatars.com/api/?name=' + (${currentUser != null} ? ${currentUser.name} : 'Nguyen Van Nga') + '&background=0D8ABC&color=fff'}"
+                         class="w-10 h-10 rounded-full border border-slate-700 shadow-sm">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold truncate"
+                           th:text="${currentUser != null} ? ${currentUser.name} : 'Nguyen Van Nga'">Nguyen Van Nga</p>
+                        <p class="text-[10px] text-emerald-400">Root Administrator</p>
+                    </div>
+                </div>
+                <a th:href="@{/logout}" class="text-slate-400 hover:text-red-500 ml-3 flex-shrink-0">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </a>
+    </div>
+
+</aside>
+</body>
+</html>

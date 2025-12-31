@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Ecosystem</title>
+    <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -13,197 +13,119 @@
 </head>
 <body class="bg-slate-50 font-sans antialiased text-slate-900">
 
-    <div class="min-h-screen flex">
-        <aside class="w-72 bg-slate-900 text-white flex-shrink-0 hidden lg:flex flex-col shadow-2xl">
-            <div class="p-6 flex items-center space-x-3 border-b border-slate-800">
-                <div class="bg-blue-600 p-2 rounded-lg">
-                    <i class="fab fa-facebook-f text-2xl text-white"></i>
-                </div>
-                <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">Meta Manager</span>
-            </div>
-            
-            <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto sidebar-scroll">
-                <p class="text-[10px] uppercase font-bold text-slate-500 px-3 mb-2 tracking-widest">Cơ bản</p>
-                <a href="/" class="flex items-center space-x-3 bg-slate-800 p-3 rounded-xl text-blue-400 border border-slate-700">
-                    <i class="fas fa-th-large w-5"></i>
-                    <span class="font-medium">Bảng điều khiển</span>
-                </a>
+<div class="min-h-screen flex">
 
-                <p class="text-[10px] uppercase font-bold text-slate-500 px-3 mt-6 mb-2 tracking-widest">Quản lý Cộng đồng</p>
-                <a href="/admin/users" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 transition text-slate-400 hover:text-white">
-                    <i class="fas fa-user-friends w-5"></i>
-                    <span>Người dùng & Log</span>
-                </a>
-                <a href="/admin/contents" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 transition text-slate-400 hover:text-white">
-                    <i class="fas fa-photo-video w-5"></i>
-                    <span>Bài viết & Media</span>
-                </a>
-                <a href="/admin/reports" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 transition text-slate-400 hover:text-white">
-                    <i class="fas fa-flag w-5"></i>
-                    <span class="flex-1">Báo cáo vi phạm</span>
-                    <span class="bg-red-500 text-[10px] px-2 py-0.5 rounded-full text-white">12</span>
-                </a>
+    <!-- SIDEBAR -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-                <p class="text-[10px] uppercase font-bold text-slate-500 px-3 mt-6 mb-2 tracking-widest">Kinh doanh & Quảng cáo</p>
-                <a href="/admin/marketplace" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 transition text-slate-400 hover:text-white">
-                    <i class="fas fa-store w-5"></i>
-                    <span>Marketplace & Dự án</span>
-                </a>
-                <a href="/admin/ads" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 transition text-slate-400 hover:text-white">
-                    <i class="fas fa-ad w-5"></i>
-                    <span>Chiến dịch Ads</span>
-                </a>
+    <!-- MAIN -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
 
-                <p class="text-[10px] uppercase font-bold text-slate-500 px-3 mt-6 mb-2 tracking-widest">Hệ thống</p>
-                <a href="/admin/settings" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 transition text-slate-400 hover:text-white">
-                    <i class="fas fa-cog w-5"></i>
-                    <span>Cấu hình & Bảo mật</span>
-                </a>
-            </nav>
+        <!-- HEADER -->
+        <div th:replace="~{fragments/header :: header}"></div>
 
-            <div class="p-4 bg-slate-950 border-t border-slate-800">
-                <div class="flex items-center space-x-3 bg-slate-900 p-3 rounded-2xl">
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" class="w-10 h-10 rounded-full border border-slate-700">
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold truncate">Nguyen Van Nga</p>
-                        <p class="text-[10px] text-emerald-400">Root Administrator</p>
+        <!-- MAIN CONTENT -->
+        <div class="p-8 flex-1 overflow-y-auto space-y-8">
+
+            <!-- Responsive dashboard cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div th:each="card : ${dashboardCards}" 
+                     class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col">
+                    <div class="flex justify-between items-start mb-4">
+                        <div th:class="'p-3 rounded-2xl ' + ${card.bgColor} + ' ' + ${card.textColor}">
+                            <i th:class="${card.icon} text-xl"></i>
+                        </div>
+                        <span th:text="${card.change}" th:class="${card.changeColor + ' text-xs font-bold'}"></span>
                     </div>
-                    <a href="/logout" class="text-slate-500 hover:text-red-400 transition"><i class="fas fa-sign-out-alt"></i></a>
+                    <h3 class="text-slate-500 text-sm font-medium" th:text="${card.title}">Title</h3>
+                    <p class="text-3xl font-black text-slate-800 mt-1" th:text="${card.value}">0</p>
                 </div>
             </div>
-        </aside>
 
-        <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 h-20 flex items-center justify-between px-8 sticky top-0 z-30">
-                <div>
-                    <h2 class="text-2xl font-extrabold text-slate-800">Bảng điều khiển</h2>
-                    <p class="text-xs text-slate-500">Chào mừng trở lại, hôm nay hệ thống có <span class="text-blue-600 font-bold">245</span> sự kiện mới.</p>
-                </div>
-                <div class="flex items-center space-x-6">
-                    <div class="hidden md:flex bg-slate-100 rounded-full px-4 py-2 items-center space-x-2 border border-slate-200">
-                        <i class="fas fa-search text-slate-400 text-sm"></i>
-                        <input type="text" placeholder="Tìm kiếm user, đơn hàng..." class="bg-transparent border-none focus:ring-0 text-sm w-48">
+            <!-- Responsive sections: activity, marketplace, security -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Activity table -->
+                <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 flex items-center">
+                            <i class="fas fa-bolt text-blue-500 mr-2"></i>Hoạt động MXH mới nhất
+                        </h3>
+                        <button class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg font-bold transition text-slate-600">
+                            Lọc dữ liệu
+                        </button>
                     </div>
-                    <button class="text-slate-500 hover:text-blue-600 relative p-2 bg-slate-100 rounded-full transition">
-                        <i class="fas fa-bell text-lg"></i>
-                        <span class="absolute top-0 right-0 bg-red-500 w-2 h-2 rounded-full border-2 border-white"></span>
-                    </button>
-                </div>
-            </header>
-
-            <div class="p-8 overflow-y-auto space-y-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 hover:shadow-md transition">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="p-3 bg-blue-100 rounded-2xl text-blue-600"><i class="fas fa-users text-xl"></i></div>
-                            <span class="text-emerald-500 text-xs font-bold">+12% <i class="fas fa-arrow-up"></i></span>
-                        </div>
-                        <h3 class="text-slate-500 text-sm font-medium">Người dùng</h3>
-                        <p class="text-3xl font-black text-slate-800 mt-1" th:text="${userCount}">1.2M</p>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 hover:shadow-md transition">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="p-3 bg-emerald-100 rounded-2xl text-emerald-600"><i class="fas fa-wallet text-xl"></i></div>
-                            <span class="text-emerald-500 text-xs font-bold">+5.4% <i class="fas fa-arrow-up"></i></span>
-                        </div>
-                        <h3 class="text-slate-500 text-sm font-medium">Doanh thu Marketplace</h3>
-                        <p class="text-3xl font-black text-slate-800 mt-1">$45.2K</p>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 hover:shadow-md transition">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="p-3 bg-amber-100 rounded-2xl text-amber-600"><i class="fas fa-bullhorn text-xl"></i></div>
-                            <span class="text-red-500 text-xs font-bold">-2% <i class="fas fa-arrow-down"></i></span>
-                        </div>
-                        <h3 class="text-slate-500 text-sm font-medium">Chiến dịch Ads</h3>
-                        <p class="text-3xl font-black text-slate-800 mt-1">84</p>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 hover:shadow-md transition">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="p-3 bg-red-100 rounded-2xl text-red-600"><i class="fas fa-exclamation-triangle text-xl"></i></div>
-                            <span class="bg-red-100 text-red-600 text-[10px] px-2 py-1 rounded-lg">Khẩn cấp</span>
-                        </div>
-                        <h3 class="text-slate-500 text-sm font-medium">Báo cáo vi phạm</h3>
-                        <p class="text-3xl font-black text-slate-800 mt-1">12</p>
+                    <div class="p-0 overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase tracking-widest font-bold">
+                                <tr>
+                                    <th class="px-6 py-4">User</th>
+                                    <th class="px-6 py-4">Hành động</th>
+                                    <th class="px-6 py-4 text-right">Thời gian</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50">
+                                <tr th:each="user : ${recentUsers}" class="hover:bg-slate-50 transition group">
+                                    <td class="px-6 py-4 flex items-center space-x-3">
+                                        <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden">
+                                            <img src="https://i.pravatar.cc/150?u=1" alt="avatar">
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-slate-700" th:text="${user.fullName}">Anh Tuấn</p>
+                                            <p class="text-[10px] text-slate-400" th:text="${user.email}">tuan@gmail.com</p>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-xs text-slate-600">Vừa đăng bài viết trong <b>Marketplace</b></span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
+                                        2 phút trước
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
-                    <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                            <h3 class="font-bold text-slate-800"><i class="fas fa-bolt text-blue-500 mr-2"></i>Hoạt động MXH mới nhất</h3>
-                            <button class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg font-bold transition text-slate-600">Lọc dữ liệu</button>
-                        </div>
-                        <div class="p-0">
-                            <table class="w-full text-left">
-                                <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase tracking-widest font-bold">
-                                    <tr>
-                                        <th class="px-6 py-4">User</th>
-                                        <th class="px-6 py-4">Hành động</th>
-                                        <th class="px-6 py-4 text-right">Thời gian</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-50">
-                                    <tr th:each="user : ${recentUsers}" class="hover:bg-slate-50 transition group">
-                                        <td class="px-6 py-4 flex items-center space-x-3">
-                                            <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden">
-                                                <img src="https://i.pravatar.cc/150?u=1" alt="avatar">
-                                            </div>
-                                            <div>
-                                                <p class="text-sm font-bold text-slate-700" th:text="${user.fullName}">Anh Tuấn</p>
-                                                <p class="text-[10px] text-slate-400" th:text="${user.email}">tuan@gmail.com</p>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <span class="text-xs text-slate-600">Vừa đăng bài viết trong <b>Marketplace</b></span>
-                                        </td>
-                                        <td class="px-6 py-4 text-right text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
-                                            2 phút trước
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="space-y-6">
-                        <div class="bg-gradient-to-br from-indigo-600 to-blue-700 p-6 rounded-3xl text-white shadow-lg">
-                            <h4 class="font-bold mb-4 flex items-center"><i class="fas fa-shopping-bag mr-2"></i> Marketplace</h4>
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center bg-white/10 p-3 rounded-xl">
-                                    <span class="text-xs">Chờ duyệt sản phẩm</span>
-                                    <span class="font-bold">18</span>
-                                </div>
-                                <div class="flex justify-between items-center bg-white/10 p-3 rounded-xl">
-                                    <span class="text-xs">Khiếu nại giao dịch</span>
-                                    <span class="font-bold">3</span>
-                                </div>
-                                <button class="w-full bg-white text-blue-700 py-2.5 rounded-xl font-bold text-xs hover:bg-blue-50 transition">Truy cập Marketplace</button>
+                <!-- Marketplace & Security stacked -->
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-br from-indigo-600 to-blue-700 p-6 rounded-3xl text-white shadow-lg">
+                        <h4 class="font-bold mb-4 flex items-center">
+                            <i class="fas fa-shopping-bag mr-2"></i> Marketplace
+                        </h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center bg-white/10 p-3 rounded-xl">
+                                <span class="text-xs">Chờ duyệt sản phẩm</span>
+                                <span class="font-bold" th:text="${pendingProducts}">0</span>
                             </div>
+                            <div class="flex justify-between items-center bg-white/10 p-3 rounded-xl">
+                                <span class="text-xs">Khiếu nại giao dịch</span>
+                                <span class="font-bold" th:text="${complaints}">0</span>
+                            </div>
+                            <button class="w-full bg-white text-blue-700 py-2.5 rounded-xl font-bold text-xs hover:bg-blue-50 transition">
+                                Truy cập Marketplace
+                            </button>
                         </div>
+                    </div>
 
-                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                            <h4 class="font-bold text-slate-800 mb-4 flex items-center text-sm"><i class="fas fa-shield-alt text-emerald-500 mr-2"></i> Bảo mật Admin</h4>
-                            <div class="space-y-3">
-                                <div class="flex items-center space-x-3 text-xs border-l-2 border-emerald-500 pl-3">
-                                    <span class="text-slate-400">14:20</span>
-                                    <span class="text-slate-700">Admin <b>Nga</b> xóa 1 post vi phạm</span>
-                                </div>
-                                <div class="flex items-center space-x-3 text-xs border-l-2 border-red-500 pl-3">
-                                    <span class="text-slate-400">13:05</span>
-                                    <span class="text-slate-700 font-bold text-red-600">Cảnh báo đăng nhập từ lạ (IP: 1.1.1.1)</span>
-                                </div>
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                        <h4 class="font-bold text-slate-800 mb-4 flex items-center text-sm">
+                            <i class="fas fa-shield-alt text-emerald-500 mr-2"></i> Bảo mật Admin
+                        </h4>
+                        <div class="space-y-3">
+                            <div th:each="event : ${securityLogs}" class="flex items-center space-x-3 text-xs border-l-2 pl-3"
+                                 th:classappend="${event.type == 'alert'} ? ' border-red-500' : ' border-emerald-500'">
+                                <span class="text-slate-400" th:text="${event.time}">14:20</span>
+                                <span class="text-slate-700" th:text="${event.message}">Admin xóa post vi phạm</span>
                             </div>
                         </div>
                     </div>
-
                 </div>
+
             </div>
-        </main>
-    </div>
+        </div>
+    </main>
+</div>
 
 </body>
 </html>

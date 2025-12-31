@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<header th:fragment="header"
+        class="bg-white/80 backdrop-blur-md border-b border-slate-200 h-20 flex items-center justify-between px-6 md:px-8 sticky top-0 z-30">
+    
+    <style>
+        /* 1. Ẩn checkbox gốc */
+        #notif-toggle { display: none; }
+
+        /* 2. Mặc định ẩn dropdown */
+        .notif-dropdown {
+            display: none;
+            /* Đảm bảo dropdown nằm đúng vị trí */
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px); 
+        }
+
+        /* 3. Khi checkbox được CHECK thì hiển thị dropdown */
+        #notif-toggle:checked ~ .notif-dropdown {
+            display: block;
+            animation: slideIn 0.2s ease-out;
+        }
+
+        /* Hiệu ứng xuất hiện cho mượt mà */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+    <div>
+        <h2 class="text-2xl font-extrabold text-slate-800">Bảng điều khiển</h2>
+        <p class="text-xs text-slate-500">
+            Hôm nay hệ thống có
+            <span class="text-blue-600 font-bold" th:text="${eventCount ?: 0}">245</span> sự kiện mới.
+        </p>
+    </div>
+
+    <div class="flex items-center space-x-4 md:space-x-6">
+
+        <div class="relative hidden md:flex items-center bg-slate-100 rounded-full px-4 py-2 border border-slate-200 w-64">
+            <i class="fas fa-search text-slate-400 text-sm"></i>
+            <input type="text" placeholder="Tìm kiếm..." class="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-full pl-2">
+        </div>
+
+        <div class="relative">
+            <label for="notif-toggle" class="cursor-pointer relative p-2 rounded-full bg-slate-100 hover:bg-slate-200 transition block">
+                <i class="fas fa-bell text-lg text-slate-500"></i>
+                <span th:if="${not #lists.isEmpty(notifications)}" 
+                      class="absolute top-0 right-0 bg-red-500 w-2 h-2 rounded-full border-2 border-white"></span>
+            </label>
+            
+            <input type="checkbox" id="notif-toggle">
+
+            <div class="notif-dropdown w-80 bg-white shadow-2xl border border-slate-200 rounded-2xl z-50 overflow-hidden">
+                <div class="px-4 py-3 font-bold text-slate-800 border-b border-slate-100 bg-slate-50/50">
+                    Thông báo mới nhất
+                </div>
+
+                <div class="divide-y divide-slate-100 max-h-80 overflow-y-auto">
+                    <th:block th:if="${not #lists.isEmpty(notifications)}">
+                        <div th:each="notif : ${notifications}" class="px-4 py-3 hover:bg-blue-50/50 cursor-pointer transition">
+                            <p class="text-sm text-slate-700" th:text="${notif.title}">Thông báo</p>
+                            <p class="text-[10px] text-slate-400 mt-1" th:text="${notif.time}">Vừa xong</p>
+                        </div>
+                    </th:block>
+
+                    <th:block th:if="${#lists.isEmpty(notifications)}">
+                        <div class="p-6 text-center">
+                            <i class="fas fa-inbox text-slate-200 text-3xl mb-2"></i>
+                            <p class="text-xs text-slate-400 font-medium">Bạn chưa có thông báo nào</p>
+                        </div>
+                        <div class="px-4 py-3 opacity-30 bg-slate-50">
+                            <p class="text-sm text-slate-600 italic font-medium">Hệ thống: Chào mừng bạn!</p>
+                            <p class="text-[10px] text-slate-400">Dữ liệu mẫu</p>
+                        </div>
+                    </th:block>
+                </div>
+
+                <div class="text-center py-3 border-t border-slate-100">
+                    <a th:href="@{/notifications}" class="text-xs font-bold text-blue-600 hover:underline">
+                        XEM TẤT CẢ
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <button class="hidden md:inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition">
+            Tạo mới
+        </button>
+
+    </div>
+
+</header>
+
+</body>
+</html>

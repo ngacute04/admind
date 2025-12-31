@@ -6,5 +6,14 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: update # Tự động update schema khi thay đổi entity
+    show-sql: true # Hiển thị câu SQL trong console
+
+  thymeleaf:
+    cache: false # Template không cache → reload khi chỉnh sửa
+
+  devtools:
+    restart:
+      enabled: true # DevTools restart
+    livereload:
+      enabled: true # LiveReload hỗ trợ refresh browser
