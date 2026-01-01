@@ -1,4 +1,28 @@
-<div th:fragment="content">
-    <h2 class="text-2xl font-bold mb-4">Marketplace</h2>
-    <p>Manage marketplace items here.</p>
-</div>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="content">
+    <div class="space-y-6">
+        <h1 class="text-2xl font-bold text-white">Tổng quan hệ thống</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div th:replace="~{this :: statCard('Người dùng', '1,250', 'fa-users', 'text-blue-500')}"></div>
+            <div th:replace="~{this :: statCard('Doanh thu', '$12,400', 'fa-dollar-sign', 'text-green-500')}"></div>
+            <div th:replace="~{this :: statCard('Bài viết', '452', 'fa-file-alt', 'text-purple-500')}"></div>
+            <div th:replace="~{this :: statCard('Báo cáo', '12', 'fa-exclamation-triangle', 'text-red-500')}"></div>
+        </div>
+    </div>
+
+    <div th:fragment="statCard(title, value, icon, colorClass)" 
+         class="bg-[#111] border border-white/5 p-6 rounded-2xl shadow-xl">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-400 text-sm" th:text="${title}"></p>
+                <p class="text-2xl font-bold text-white mt-1" th:text="${value}"></p>
+            </div>
+            <div th:class="${'p-3 rounded-xl bg-white/5 ' + colorClass}">
+                <i th:class="${'fas ' + icon}"></i>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,74 +1,121 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        /* 1. KHUNG HÌNH CỐ ĐỊNH */
+        html, body {
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Chỉ scroll nội dung chính */
+            background-color: #050505;
+        }
+
+        /* 2. THANH CUỘN SIDEBAR */
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 3px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .sidebar-scroll:hover::-webkit-scrollbar-thumb {
+            background: #b91c1c; /* đỏ mafia khi hover */
+        }
+
+        /* 3. CHỐNG GIẬT */
+        .stationary-box {
+            backface-visibility: hidden;
+            transform: translateZ(0);
+        }
+
+        /* 4. CỐ ĐỊNH SIDEBAR */
+        aside[th\\:fragment="sidebar"] {
+            position: fixed;  /* sidebar luôn dính */
+            top: 0;
+            left: 0;
+            height: 100vh;    /* full height */
+            z-index: 50;
+        }
+
+        /* 5. NỘI DUNG CHÍNH */
+        main {
+            margin-left: 18rem; /* w-72 = 18rem */
+            height: 100vh;
+            overflow-y: auto;
+            background-color: #0a0a0a;
+            padding: 2rem;
+            color: white;
+        }
+    </style>
+</head>
 <body>
 
 <aside th:fragment="sidebar"
-       class="w-72 bg-slate-900 text-white flex-shrink-0 hidden lg:flex flex-col shadow-2xl">
+       class="w-72 h-screen bg-[#050505] text-white flex-shrink-0 hidden lg:flex flex-col relative border-r border-white/5 shadow-2xl stationary-box">
 
-    <!-- LOGO -->
-    <div class="p-6 flex items-center space-x-3 border-b border-slate-800">
-        <div class="bg-blue-600 p-2 rounded-lg">
-            <i class="fas fa-bolt"></i>
+    <div class="p-6 flex items-center space-x-3 border-b border-white/5 flex-shrink-0 bg-[#050505]">
+        <div class="bg-red-600 p-2 rounded-lg shadow-lg shadow-red-900/40">
+            <i class="fas fa-bolt text-white"></i>
         </div>
-        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
+        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-red-800">
             Admin Manager
         </span>
     </div>
 
-    <!-- MENU -->
-    <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto sidebar-scroll">
-        <p class="text-[10px] uppercase font-bold text-slate-500 px-3 mb-2 tracking-widest">Cơ bản</p>
-        <a href="/admin" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white">
-            <i class="fas fa-th-large w-5"></i>
+    <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto sidebar-scroll pb-28 bg-[#050505]">
+        <p class="text-[10px] uppercase font-bold text-gray-500 px-3 mb-2 tracking-widest">Cơ bản</p>
+        <a href="/admin" class="group flex items-center space-x-3 p-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-none">
+            <i class="fas fa-th-large w-5 group-hover:text-red-500 transition-none"></i>
             <span>Dashboard</span>
         </a>
 
-        <p class="text-[10px] uppercase font-bold text-slate-500 px-3 mt-6 mb-2 tracking-widest">Quản lý Cộng đồng</p>
-        <a href="/admin/users" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white">
-            <i class="fas fa-user-friends w-5"></i>
+        <p class="text-[10px] uppercase font-bold text-gray-500 px-3 mt-6 mb-2 tracking-widest">Quản lý Cộng đồng</p>
+        <a href="/admin/users" class="group flex items-center space-x-3 p-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-none">
+            <i class="fas fa-user-friends w-5 group-hover:text-red-500 transition-none"></i>
             <span>Người dùng & Log</span>
         </a>
-        <a href="/admin/contents" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white">
-            <i class="fas fa-photo-video w-5"></i>
+        <a href="/admin/contents" class="group flex items-center space-x-3 p-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-none">
+            <i class="fas fa-photo-video w-5 group-hover:text-red-500 transition-none"></i>
             <span>Bài viết & Media</span>
         </a>
-        <a href="/admin/reports" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white">
-            <i class="fas fa-flag w-5"></i>
+        <a href="/admin/reports" class="group flex items-center space-x-3 p-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-none">
+            <i class="fas fa-flag w-5 group-hover:text-red-500 transition-none"></i>
             <span class="flex-1">Báo cáo vi phạm</span>
-        
         </a>
 
-        <p class="text-[10px] uppercase font-bold text-slate-500 px-3 mt-6 mb-2 tracking-widest">Kinh doanh & Quảng cáo</p>
-        <a href="/admin/marketplace" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white">
-            <i class="fas fa-store w-5"></i>
+        <p class="text-[10px] uppercase font-bold text-gray-500 px-3 mt-6 mb-2 tracking-widest">Kinh doanh & Quảng cáo</p>
+        <a href="/admin/marketplace" class="group flex items-center space-x-3 p-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-none">
+            <i class="fas fa-store w-5 group-hover:text-red-500 transition-none"></i>
             <span>Marketplace & Dự án</span>
         </a>
-        <a href="/admin/ads" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white">
-            <i class="fas fa-ad w-5"></i>
+        <a href="/admin/ads" class="group flex items-center space-x-3 p-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-none">
+            <i class="fas fa-ad w-5 group-hover:text-red-500 transition-none"></i>
             <span>Chiến dịch Ads</span>
         </a>
 
-        <p class="text-[10px] uppercase font-bold text-slate-500 px-3 mt-6 mb-2 tracking-widest">Hệ thống</p>
-        <a href="/admin/settings" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white">
-            <i class="fas fa-cog w-5"></i>
+        <p class="text-[10px] uppercase font-bold text-gray-500 px-3 mt-6 mb-2 tracking-widest">Hệ thống</p>
+        <a href="/admin/settings" class="group flex items-center space-x-3 p-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-none">
+            <i class="fas fa-cog w-5 group-hover:text-red-500 transition-none"></i>
             <span>Cấu hình & Bảo mật</span>
         </a>
     </nav>
 
-    <!-- USER -->
-    <div class="p-4 bg-slate-950 border-t border-slate-800">
+    <div class="absolute bottom-0 left-0 w-full p-4 bg-[#050505] border-t border-white/5 z-50">
         <a th:href="@{/profile}" class="block">
-            <div class="flex items-center justify-between bg-slate-900 p-3 rounded-2xl hover:bg-slate-800 transition cursor-pointer">
-                <div class="flex items-center space-x-3">
-                    <img th:src="@{'https://ui-avatars.com/api/?name=' + (${currentUser != null} ? ${currentUser.name} : 'Nguyen Van Nga') + '&background=0D8ABC&color=fff'}"
-                         class="w-10 h-10 rounded-full border border-slate-700 shadow-sm">
+            <div class="flex items-center justify-between bg-white/5 p-3 rounded-2xl hover:bg-white/10 transition-none cursor-pointer border border-white/5 shadow-xl">
+                <div class="flex items-center space-x-3 min-w-0">
+                    <img th:src="@{'https://ui-avatars.com/api/?name=' + (${currentUser != null} ? ${currentUser.name} : 'Nguyen Van Nga') + '&background=b91c1c&color=fff&bold=true'}"
+                         class="w-10 h-10 rounded-xl border border-white/10 shadow-sm object-cover">
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold truncate"
+                        <p class="text-sm font-bold truncate text-white uppercase tracking-tight"
                            th:text="${currentUser != null} ? ${currentUser.name} : 'Nguyen Van Nga'">Nguyen Van Nga</p>
-                        <p class="text-[10px] text-emerald-400">Root Administrator</p>
+                        <p class="text-[10px] text-red-500 font-bold uppercase tracking-tighter">Root Administrator</p>
                     </div>
                 </div>
-                <a th:href="@{/logout}" class="text-slate-400 hover:text-red-500 ml-3 flex-shrink-0">
+                <a th:href="@{/logout}" class="text-gray-500 hover:text-red-500 ml-3 flex-shrink-0 transition-none">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>
             </div>
@@ -76,5 +123,27 @@
     </div>
 
 </aside>
+
+<main>
+    <h1>Dashboard Content</h1>
+    <p>Phần nội dung chính cuộn độc lập với sidebar.</p>
+    <p style="margin-top:1000px;">Scroll test cuối trang</p>
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const menu = document.querySelector('nav');
+
+        // Khi load, lấy vị trí scroll cũ
+        const scrollPos = localStorage.getItem('sidebar-scroll');
+        if (scrollPos) menu.scrollTop = scrollPos;
+
+        // Lưu vị trí scroll
+        menu.addEventListener('scroll', function() {
+            localStorage.setItem('sidebar-scroll', menu.scrollTop);
+        });
+    });
+</script>
+
 </body>
 </html>

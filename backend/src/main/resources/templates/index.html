@@ -29,7 +29,7 @@
         <div th:replace="~{fragments/header :: header}"></div>
 
         <!-- NỘI DUNG ĐỘNG CỦA TỪNG TRANG -->
-        <div th:replace="${pageContent}"></div>
+        <div th:if="${pageContent}" th:replace="~{__${pageContent}__}"></div>
 
     </main>
 </div>

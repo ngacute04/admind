@@ -3,7 +3,7 @@
 <body>
 
 <header th:fragment="header"
-        class="bg-white/80 backdrop-blur-md border-b border-slate-200 h-20 flex items-center justify-between px-6 md:px-8 sticky top-0 z-30">
+        class="bg-white/80 backdrop-blur-md border-b border-slate-200 h-20 flex items-center justify-between px-6 md:px-8 sticky top-0 z-50">
     
     <style>
         /* 1. Ẩn checkbox gốc */
@@ -12,7 +12,6 @@
         /* 2. Mặc định ẩn dropdown */
         .notif-dropdown {
             display: none;
-            /* Đảm bảo dropdown nằm đúng vị trí */
             position: absolute;
             right: 0;
             top: calc(100% + 10px); 
@@ -24,7 +23,12 @@
             animation: slideIn 0.2s ease-out;
         }
 
-        /* Hiệu ứng xuất hiện cho mượt mà */
+        /* Xóa ô vuông (outline) khi click vào label/icon */
+        label[for="notif-toggle"] {
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -46,8 +50,8 @@
             <input type="text" placeholder="Tìm kiếm..." class="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-full pl-2">
         </div>
 
-        <div class="relative">
-            <label for="notif-toggle" class="cursor-pointer relative p-2 rounded-full bg-slate-100 hover:bg-slate-200 transition block">
+        <div class="relative" id="notif-container">
+            <label for="notif-toggle" class="cursor-pointer relative p-2 rounded-full bg-slate-100 hover:bg-slate-200 transition block focus:outline-none">
                 <i class="fas fa-bell text-lg text-slate-500"></i>
                 <span th:if="${not #lists.isEmpty(notifications)}" 
                       class="absolute top-0 right-0 bg-red-500 w-2 h-2 rounded-full border-2 border-white"></span>
@@ -73,10 +77,6 @@
                             <i class="fas fa-inbox text-slate-200 text-3xl mb-2"></i>
                             <p class="text-xs text-slate-400 font-medium">Bạn chưa có thông báo nào</p>
                         </div>
-                        <div class="px-4 py-3 opacity-30 bg-slate-50">
-                            <p class="text-sm text-slate-600 italic font-medium">Hệ thống: Chào mừng bạn!</p>
-                            <p class="text-[10px] text-slate-400">Dữ liệu mẫu</p>
-                        </div>
                     </th:block>
                 </div>
 
@@ -91,8 +91,19 @@
         <button class="hidden md:inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition">
             Tạo mới
         </button>
-
     </div>
+
+    <script>
+        document.addEventListener('click', function(event) {
+            const container = document.getElementById('notif-container');
+            const toggle = document.getElementById('notif-toggle');
+            
+            // Nếu vị trí click KHÔNG nằm trong container thông báo
+            if (!container.contains(event.target)) {
+                toggle.checked = false; // Tắt checkbox -> ẩn dropdown
+            }
+        });
+    </script>
 
 </header>
 
