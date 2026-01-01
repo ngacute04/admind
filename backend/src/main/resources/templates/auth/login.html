@@ -2,7 +2,7 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>The Admin | Secure Access</title>
+    <title>RedZone | Kết Nối Đam Mê</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -10,42 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
-
-
-
-/* Hiệu ứng glow gradient chạy */
-.node-text {
-    font-size: 10px;
-    color: #f5f5f5;
-    background: linear-gradient(90deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
-    background-size: 400% 100%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: glow-text 4s linear infinite;
-}
-
-@keyframes glow-text {
-    0% { background-position: 0% 0%; }
-    100% { background-position: 400% 0%; }
-}
-
-/* Giữ status-pulse nhấp nháy */
-.status-pulse {
-    width: 8px;
-    height: 8px;
-    background: #ef4444;
-    border-radius: 50%;
-    display: inline-block;
-    box-shadow: 0 0 10px #ef4444;
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-    50% { transform: scale(1.3); box-shadow: 0 0 10px 6px rgba(239, 68, 68, 0.5); }
-}
-
-
         :root {
             --primary-red: #b91c1c;
             --dark-bg: #050505;
@@ -56,249 +20,242 @@
             background: var(--dark-bg);
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: #f5f5f5;
-            overflow: hidden;
+            /* Tối ưu cho mobile: Cho phép cuộn khi màn hình nhỏ */
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
         }
 
-        /* Nền hiệu ứng hạt động (Canvas sẽ vẽ ở đây) */
         #particles-js {
-            position: absolute;
+            position: fixed; /* Đổi sang fixed để không bị trôi khi cuộn mobile */
             width: 100%;
             height: 100%;
             z-index: -1;
         }
 
-        /* Hiệu ứng mây đỏ huyền bí */
         .bg-glow {
-            position: absolute;
+            position: fixed;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(185, 28, 28, 0.12) 0%, rgba(0,0,0,0) 70%);
+            background: radial-gradient(circle, rgba(185, 28, 28, 0.15) 0%, rgba(0,0,0,0) 70%);
             border-radius: 50%;
             filter: blur(80px);
             z-index: -1;
-            animation: moveGlow 20s infinite alternate;
         }
 
-        @keyframes moveGlow {
-            from { transform: translate(-10%, -10%); }
-            to { transform: translate(10%, 10%); }
-        }
-
-        /* Nâng cấp Card & Panel */
         #mainContainer {
+            background: transparent;
+            z-index: 10;
+            /* Thêm padding top/bottom để không bị dính sát mép trên mobile */
+            padding-top: 2rem;
+            padding-bottom: 8rem;
+        }
+
+        #loginCard {
             background: rgba(10, 10, 10, 0.6);
             backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px); /* Hỗ trợ Safari */
             border: 1px solid var(--glass-border);
-            animation: entrance 1s cubic-bezier(0.22, 1, 0.36, 1);
+            border-radius: 2.5rem;
         }
 
-        #leftPanel {
-            background: linear-gradient(165deg, rgba(15, 15, 15, 0.8) 0%, rgba(35, 5, 5, 0.6) 100%);
-            border-right: 1px solid var(--glass-border);
-        }
-
-        /* Input Interaction */
         .input-group input {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--glass-border);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
+            font-size: 16px !important; /* Ngăn iOS tự động zoom khi focus vào input */
         }
 
         .input-group input:focus {
             background: rgba(185, 28, 28, 0.05);
             border-color: var(--primary-red);
-            box-shadow: 0 0 20px rgba(185, 28, 28, 0.15), inset 0 0 10px rgba(185, 28, 28, 0.05);
-            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(185, 28, 28, 0.1);
         }
 
-        /* Button Glow */
-        .btn-glow {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-        }
-
-        .btn-glow::after {
-            content: '';
+     #loginError {
             position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-            transform: scale(0);
-            transition: transform 0.6s ease;
+            top: -57px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 5, 5, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(185, 28, 28, 0.4);
+            color: #fca5a5;
+            padding: 10px 20px;
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            z-index: 100;
+            white-space: nowrap;
         }
 
-        .btn-glow:hover::after { transform: scale(1); }
-
-        /* Floating Error */
-      #loginError {
-    position: absolute;
-    top: -57px; left: 50%;
-    transform: translateX(-50%) translateY(10px);
-    background: rgba(15, 5, 5, 0.8);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(185, 28, 28, 0.4);
-    color: #fca5a5;
-    padding: 10px 20px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    opacity: 0;
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    pointer-events: none;
-    z-index: 100;
-    white-space: nowrap; /* <-- thêm dòng này để text không xuống hàng */
-}
-
-#loginError.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-
-
-        /* Entrance Animation */
-        @keyframes entrance {
-            from { opacity: 0; transform: scale(0.98) translateY(20px); filter: blur(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+        #loginError.show {
+            opacity: 1;
         }
 
-        #pageLoader {
-            position: fixed;
-            inset: 0;
-            background: black;
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.8s ease;
+
+
+        /* Tối ưu Footer cho mobile */
+       .footer-fixed {
+    /* Đưa về vị trí tuyệt đối ở đáy */
+    position: absolute; 
+    bottom: 1rem; /* Khoảng cách từ chữ đến mép dưới màn hình (chỉnh số này nhỏ đi nếu muốn thấp hơn nữa) */
+    left: 50%;
+    transform: translateX(-50%);
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem; /* Thu nhỏ khoảng cách giữa 2 dòng chữ */
+    z-index: 20;
+    width: 100%;
+}
+
+        @media (min-height: 800px) {
+            .footer-fixed {
+                position: fixed;
+                bottom: 2rem;
+                left: 50%;
+                transform: translateX(-50%);
+                margin-top: 0;
+            }
+        }
+
+        .footer-link {
+            transition: all 0.3s ease;
+            color: rgba(156, 163, 175, 0.6);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        
+        .footer-link:hover {
+            color: #ef4444;
+        }
+
+        .highlight-text {
+            background: linear-gradient(90deg, #fff, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
     </style>
 </head>
 
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="flex flex-col items-center justify-center p-4">
 
     <div id="particles-js"></div>
     <div class="bg-glow" style="top: -10%; left: -10%;"></div>
     <div class="bg-glow" style="bottom: -10%; right: -10%;"></div>
 
-    <div id="pageLoader">
-        <div class="relative flex items-center justify-center">
-            <div class="w-20 h-20 border-2 border-red-900/30 rounded-full"></div>
-            <div class="w-20 h-20 border-t-2 border-red-600 rounded-full animate-spin absolute"></div>
-            <i class="fas fa-user-secret text-red-600 absolute animate-pulse"></i>
-        </div>
-    </div>
-
-    <main id="mainContainer" class="relative w-full max-w-5xl grid grid-cols-1 md:grid-cols-12 gap-0 overflow-hidden rounded-[2.5rem] shadow-2xl">
+    <main id="mainContainer" class="relative w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         
-        <div id="leftPanel" class="hidden md:flex md:col-span-5 flex-col justify-between p-12 relative overflow-hidden">
-            <div class="relative z-10">
-                <div class="flex items-center gap-4 mb-10">
-                    <div class="w-14 h-14 bg-gradient-to-br from-red-600 to-red-950 rounded-2xl flex items-center justify-center shadow-lg shadow-red-900/40 border border-white/10">
-                        <i class="fas fa-user-secret text-2xl"></i>
+        <div class="hidden lg:flex lg:col-span-6 flex-col justify-center p-12">
+            <h1 class="text-7xl font-extrabold mb-4 tracking-tighter">Red<span class="text-red-600">Zone</span></h1>
+            <h2 class="text-2xl font-bold mb-6 highlight-text">Chạm vào thế giới mới.</h2>
+            
+            <div class="space-y-8 max-w-lg">
+                <div class="flex items-start gap-4">
+                    <i class="fas fa-users text-red-500 mt-1 text-xl"></i>
+                    <div>
+                        <h4 class="font-bold text-gray-200">Kết nối không giới hạn</h4>
+                        <p class="text-sm text-gray-400">Tham gia cùng hàng triệu người dùng, chia sẻ đam mê và tìm thấy cộng đồng thuộc về bạn.</p>
                     </div>
-                    <h2 class="text-3xl font-bold tracking-tight uppercase">The <span class="text-red-600">Admin</span></h2>
                 </div>
 
-                <p class="text-gray-400 leading-relaxed mb-10 text-sm">
-                    Identity verified systems only. Proceed with absolute caution.
-                </p>
+                <div class="flex items-start gap-4">
+                    <i class="fas fa-bolt text-red-500 mt-1 text-xl"></i>
+                    <div>
+                        <h4 class="font-bold text-gray-200">Trải nghiệm tức thì</h4>
+                        <p class="text-sm text-gray-400">Tốc độ tải siêu nhanh, cập nhật xu hướng nóng hổi ngay trên bảng tin mỗi giây.</p>
+                    </div>
+                </div>
 
-                <ul class="space-y-8">
-                    <li class="flex items-center gap-4 group cursor-default">
-                        <div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center group-hover:border-red-600/50 transition-all duration-500">
-                            <i class="fas fa-fingerprint text-red-500 text-lg"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold">Biometric Access</p>
-                            <p class="text-xs text-gray-500">Multi-layer encryption</p>
-                        </div>
-                    </li>
-                    <li class="flex items-center gap-4 group">
-                        <div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center group-hover:border-red-600/50 transition-all duration-500">
-                            <i class="fas fa-satellite-dish text-red-500 text-lg"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold">Real-time Intel</p>
-                            <p class="text-xs text-gray-500">Activity monitoring active</p>
-                        </div>
-                    </li>
-                </ul>
+                <div class="flex items-start gap-4">
+                    <i class="fas fa-gift text-red-500 mt-1 text-xl"></i>
+                    <div>
+                        <h4 class="font-bold text-gray-200">Phần thưởng độc quyền</h4>
+                        <p class="text-sm text-gray-400">Đăng ký ngay hôm nay để nhận huy hiệu "Thành viên tiên phong" và nhiều ưu đãi hấp dẫn.</p>
+                    </div>
+                </div>
             </div>
 
-            <div class="relative z-10 pt-8 w-full flex justify-center">
-    <div class="flex items-center gap-3 bg-black/40 w-fit px-4 py-2 rounded-full border border-white/5">
-        <span class="status-pulse"></span>
-        <span class="node-text uppercase tracking-[0.2em] font-bold">Node: Secure-Red-Alpha</span>
-    </div>
-</div>
-
+            <div class="mt-10 flex items-center gap-4">
+                <div class="flex -space-x-3">
+                    <img class="w-10 h-10 rounded-full border-2 border-black" src="https://i.pravatar.cc/100?u=1" alt="">
+                    <img class="w-10 h-10 rounded-full border-2 border-black" src="https://i.pravatar.cc/100?u=2" alt="">
+                    <img class="w-10 h-10 rounded-full border-2 border-black" src="https://i.pravatar.cc/100?u=3" alt="">
+                </div>
+                <p class="text-xs text-gray-500 font-medium">+10k người vừa mới tham gia vào hôm nay</p>
+            </div>
         </div>
 
-        <div class="md:col-span-7 flex items-center justify-center p-8 md:p-16 relative">
-            
-            <div id="loginCard" class="w-full max-w-md p-10 rounded-3xl relative border border-white/5 bg-black/20">
+        <div class="lg:col-span-6 flex flex-col items-center justify-center relative w-full">
+            <div class="lg:hidden text-center mb-8">
+                <h1 class="text-5xl font-extrabold tracking-tighter">Red<span class="text-red-600">Zone</span></h1>
+            </div>
+
+            <div id="loginCard" class="w-full max-w-md p-8 md:p-10 relative">
                 
                 <div id="loginError" th:if="${param.error}" class="show">
-                    <i class="fas fa-exclamation-triangle text-red-500"></i>
-                    <span class="text-xs font-bold tracking-wide">ACCESS DENIED: INVALID CREDENTIALS</span>
+                    <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
+                    <span class="text-xs font-bold tracking-wide uppercase">Thông tin không chính xác</span>
+                </div>
+                <div class="text-center mb-8">
+                    <h3 class="text-xl md:text-2xl font-bold tracking-tight uppercase">Bắt đầu hành trình</h3>
+                    <div class="h-1 w-8 bg-red-600 mx-auto rounded-full mt-2"></div>
                 </div>
 
-                <div class="text-center mb-10">
-                    <h3 class="text-4xl font-extrabold mb-3 tracking-tight">Identity Check</h3>
-                    <div class="h-1 w-12 bg-red-600 mx-auto rounded-full mb-4"></div>
-                    <p class="text-gray-500 text-xs uppercase tracking-widest font-semibold">Authentication Required</p>
-                </div>
-
-                <form id="loginForm" method="POST" th:action="@{/login}" class="space-y-6">
+                <form id="loginForm" method="POST" th:action="@{/login}" class="space-y-5">
                     <div class="input-group">
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em] mb-2 ml-1">Universal Identity</label>
-                        <div class="relative group">
-                            <i class="fas fa-at absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-red-600 transition-colors"></i>
+                        <div class="relative">
+                            <i class="fas fa-user-circle absolute left-4 top-1/2 -translate-y-1/2 text-gray-600"></i>
                             <input type="email" name="email" required
-                                   class="w-full pl-12 pr-4 py-4 rounded-2xl text-white placeholder-gray-700 outline-none"
-                                   placeholder="id@system.com">
+                                   class="w-full pl-12 pr-4 py-4 rounded-2xl text-white outline-none text-sm"
+                                   placeholder="Email đăng ký">
                         </div>
                     </div>
 
                     <div class="input-group">
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em] mb-2 ml-1">Access Cipher</label>
-                        <div class="relative group">
-                            <i class="fas fa-key absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-red-600 transition-colors"></i>
+                        <div class="relative">
+                            <i class="fas fa-key absolute left-4 top-1/2 -translate-y-1/2 text-gray-600"></i>
                             <input type="password" name="password" required
-                                   class="w-full pl-12 pr-4 py-4 rounded-2xl text-white placeholder-gray-700 outline-none"
-                                   placeholder="••••••••">
+                                   class="w-full pl-12 pr-4 py-4 rounded-2xl text-white outline-none text-sm"
+                                   placeholder="Mật khẩu">
                         </div>
-                    </div>
-
-                    <div class="flex justify-between items-center px-1">
-                        <label class="flex items-center gap-2 cursor-pointer group">
-                            <div class="relative flex items-center">
-                                <input type="checkbox" class="peer appearance-none w-4 h-4 border border-white/10 rounded checked:bg-red-600 transition-all">
-                                <i class="fas fa-check absolute text-[10px] text-white opacity-0 peer-checked:opacity-100 left-0.5"></i>
-                            </div>
-                            <span class="text-[11px] text-gray-500 group-hover:text-gray-300 transition-colors">Keep Session Active</span>
-                        </label>
-                        <a href="#" class="text-[11px] text-red-600 font-bold hover:text-red-400 transition-colors uppercase tracking-tighter">Forgotten Cipher?</a>
                     </div>
 
                     <button type="submit"
-                            class="btn-glow w-full py-4 rounded-2xl bg-red-700 text-white font-black uppercase tracking-[0.2em] text-xs
-                                   shadow-2xl shadow-red-900/20 hover:bg-red-600 transition-all active:scale-[0.97]
-                                   flex items-center justify-center gap-3">
-                        <span id="btnText">Execute Login</span>
-                        <i id="loadingIcon" class="fas fa-circle-notch hidden"></i>
+                            class="w-full py-4 rounded-2xl bg-red-700 text-white font-bold uppercase tracking-[0.2em] text-xs shadow-2xl shadow-red-900/40 hover:bg-red-600 transition-all active:scale-[0.98]">
+                        Đăng nhập
                     </button>
+
+                    <div class="flex flex-col items-center gap-4 pt-2">
+                        <div class="flex justify-between w-full px-1">
+                            <a th:href="@{/register}" class="text-[10px] md:text-[11px] text-green-500 font-bold hover:text-green-400 transition-colors uppercase tracking-widest no-underline">Tạo tài khoản</a>
+                            <a th:href="@{/forgot-password}" class="text-[10px] md:text-[11px] text-gray-500 hover:text-red-500 transition-colors uppercase tracking-widest font-bold no-underline">Quên mật khẩu?</a>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
     </main>
 
+    <footer class="footer-fixed">
+        <div class="flex gap-4 md:gap-6">
+            <a href="/help" class="footer-link">Trợ giúp</a>
+            <a href="/privacy" class="footer-link">Quyền riêng tư</a>
+            <a href="/terms" class="footer-link">Điều khoản</a>
+        </div>
+        <p class="text-[9px] text-gray-700 tracking-[0.2em] md:tracking-[0.3em] uppercase text-center">© 2026 RedZone Hệ thống kết nối</p>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
-        // Particle Background Config
         particlesJS("particles-js", {
             "particles": {
-                "number": { "value": 80 },
+                "number": { "value": 40 }, /* Giảm bớt để mượt hơn trên mobile */
                 "color": { "value": "#b91c1c" },
                 "shape": { "type": "circle" },
                 "opacity": { "value": 0.2 },
@@ -309,38 +266,10 @@
         });
 
         document.addEventListener("DOMContentLoaded", () => {
-            const form = document.getElementById("loginForm");
-            const btnText = document.getElementById("btnText");
-            const loadingIcon = document.getElementById("loadingIcon");
-            const pageLoader = document.getElementById("pageLoader");
             const errorBox = document.getElementById("loginError");
-
-            // Hide Loader after page load
-            setTimeout(() => {
-                pageLoader.style.opacity = '0';
-                setTimeout(() => pageLoader.style.display = 'none', 800);
-            }, 500);
-
-            form.addEventListener("submit", (e) => {
-                e.preventDefault();
-                
-                // Button UI feedback
-                btnText.textContent = "Verifying Protocol...";
-                loadingIcon.classList.remove("hidden");
-                loadingIcon.classList.add("fa-spin");
-                
-                // Start a premium feel transition
-                setTimeout(() => {
-                    pageLoader.style.display = 'flex';
-                    pageLoader.style.opacity = '1';
-                    
-                    setTimeout(() => form.submit(), 600);
-                }, 1200);
-            });
-
             if (errorBox && errorBox.classList.contains('show')) {
                 setTimeout(() => {
-                    errorBox.classList.remove('show');
+                    errorBox.style.opacity = '0';
                     const url = new URL(window.location);
                     url.searchParams.delete('error');
                     window.history.replaceState({}, document.title, url);
