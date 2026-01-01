@@ -1,4 +1,4 @@
-package com.example.demo.controller;
+package com.example.usermanagement.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +16,13 @@ public class AdminController {
         return "index";
     }
 
+/*************  ✨ Windsurf Command ⭐  *************/
+    /**
+     * Display the users page.
+     * This page will show the list of all users registered in the system.
+     * The page will also have a link to create a new user.
+     */
+/*******  29b3d5bc-ee5e-4a73-9412-83f0e43f4698  *******/
     @GetMapping("/users")
     public String users(Model model) {
         model.addAttribute("pageContent", "admin/users :: content");

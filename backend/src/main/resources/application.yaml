@@ -2,18 +2,22 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/nguyenvannga
     username: nguyenvannga
-    password:
+    password: "" # Thêm cặp nháy kép nếu mật khẩu trống
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update # Tự động update schema khi thay đổi entity
-    show-sql: true # Hiển thị câu SQL trong console
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
   thymeleaf:
-    cache: false # Template không cache → reload khi chỉnh sửa
+    cache: false
 
   devtools:
     restart:
-      enabled: true # DevTools restart
+      enabled: true
     livereload:
-      enabled: true # LiveReload hỗ trợ refresh browser
+      enabled: true
