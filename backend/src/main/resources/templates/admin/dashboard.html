@@ -1,15 +1,67 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<body th:fragment="content">
-    <div class="space-y-6">
-        <h1 class="text-2xl font-bold text-white">Tổng quan hệ thống</h1>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div th:replace="~{this :: statCard('Người dùng', '1,250', 'fa-users', 'text-blue-500')}"></div>
-            <div th:replace="~{this :: statCard('Doanh thu', '$12,400', 'fa-dollar-sign', 'text-green-500')}"></div>
-            <div th:replace="~{this :: statCard('Bài viết', '452', 'fa-file-alt', 'text-purple-500')}"></div>
-            <div th:replace="~{this :: statCard('Báo cáo', '12', 'fa-exclamation-triangle', 'text-red-500')}"></div>
+<head>
+    </head>
+<body>
+    <div th:fragment="content">
+        <div class="space-y-6">
+            <h1 class="text-2xl font-bold text-white">Tổng quan hệ thống</h1>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div th:replace="~{admin/dashboard :: statCard('Người dùng', ${totalUsers}, 'fa-users', 'text-blue-500')}"></div>
+                <div th:replace="~{admin/dashboard :: statCard('Doanh thu', ${revenue}, 'fa-dollar-sign', 'text-green-500')}"></div>
+                <div th:replace="~{admin/dashboard :: statCard('Bài viết', ${totalPosts}, 'fa-file-alt', 'text-purple-500')}"></div>
+                <div th:replace="~{admin/dashboard :: statCard('Báo cáo', ${reportsCount}, 'fa-exclamation-triangle', 'text-red-500')}"></div>
+            </div>
+
+            <div class="mt-8 bg-[#111] border border-white/5 p-6 rounded-2xl shadow-xl">
+                <h2 class="text-white font-semibold mb-4">Tăng trưởng người dùng 7 ngày qua</h2>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
         </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script th:inline="javascript">
+            // Đảm bảo DOM đã load xong mới vẽ Chart
+            document.addEventListener('DOMContentLoaded', function() {
+                const ctx = document.getElementById('growthChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'],
+                            datasets: [{
+                                label: 'Người dùng mới',
+                                data: [12, 19, 3, 5, 2, 3, 15],
+                                borderColor: '#3b82f6',
+                                tension: 0.4,
+                                fill: true,
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                pointBackgroundColor: '#3b82f6'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: { 
+                                    beginAtZero: true,
+                                    grid: { color: 'rgba(255,255,255,0.05)' },
+                                    ticks: { color: '#888' }
+                                },
+                                x: { 
+                                    grid: { display: false },
+                                    ticks: { color: '#888' }
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        </script>
     </div>
 
     <div th:fragment="statCard(title, value, icon, colorClass)" 

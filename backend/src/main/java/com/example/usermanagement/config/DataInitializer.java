@@ -1,16 +1,16 @@
 package com.example.usermanagement.config;
 
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.example.usermanagement.entity.Role;
 import com.example.usermanagement.entity.User;
 import com.example.usermanagement.repository.RoleRepository;
 import com.example.usermanagement.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 @Configuration
 public class DataInitializer implements CommandLineRunner {
@@ -25,51 +25,40 @@ public class DataInitializer implements CommandLineRunner {
     private PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional
     public void run(String... args) {
+        // 1. Khởi tạo Roles
+        Role adminRole = initRole("ROLE_ADMIN");
+        Role userRole = initRole("ROLE_USER");
 
-        // ===== 1. TẠO ROLE NẾU CHƯA TỒN TẠI =====
-        Role adminRole = roleRepository.findByName("ROLE_ADMIN")
+        // 2. Khởi tạo tài khoản Admin tối cao (Người cấp quyền cho người khác)
+        initUser("nga@gmail.com", "120204", "Administrator", adminRole);
+
+        // 3. Khởi tạo tài khoản User mẫu (Để test luồng mạng xã hội)
+        initUser("user@example.com", "password", "Default User", userRole);
+
+        System.out.println("=== DataInitializer: Ready for RedZone Social Network ===");
+    }
+
+    private Role initRole(String roleName) {
+        return roleRepository.findByName(roleName)
                 .orElseGet(() -> {
                     Role role = new Role();
-                    role.setName("ROLE_ADMIN");
+                    role.setName(roleName);
                     return roleRepository.save(role);
                 });
+    }
 
-        Role userRole = roleRepository.findByName("ROLE_USER")
-                .orElseGet(() -> {
-                    Role role = new Role();
-                    role.setName("ROLE_USER");
-                    return roleRepository.save(role);
-                });
-
-        // ===== 2. TẠO TÀI KHOẢN ADMIN MẶC ĐỊNH =====
-        String adminEmail = "nga@gmail.com";
-        if (userRepository.findByEmail(adminEmail).isEmpty()) {
-            User adminUser = new User();
-            // Bổ sung username để tránh lỗi NOT NULL constraint
-            adminUser.setEmail(adminEmail);
-            adminUser.setPassword(passwordEncoder.encode("120204"));
-            adminUser.setEnabled(true);
-            adminUser.setRoles(Set.of(adminRole));
-
-            userRepository.save(adminUser);
-            System.out.println("--> Created Admin User");
+    private void initUser(String email, String password, String fullName, Role role) {
+        if (userRepository.findByEmail(email).isEmpty()) {
+            User user = new User();
+            user.setEmail(email);
+            user.setPassword(passwordEncoder.encode(password));
+            user.setFullName(fullName);
+            user.setEnabled(true);
+            user.setRoles(Set.of(role));
+            userRepository.save(user);
+            System.out.println("--> Created account: " + email + " with role: " + role.getName());
         }
-
-        // ===== 3. TẠO TÀI KHOẢN USER MẶC ĐỊNH =====
-        String userEmail = "user@example.com";
-        if (userRepository.findByEmail(userEmail).isEmpty()) {
-            User normalUser = new User();
-            // Bổ sung username để tránh lỗi NOT NULL constraint
-            normalUser.setEmail(userEmail);
-            normalUser.setPassword(passwordEncoder.encode("password"));
-            normalUser.setEnabled(true);
-            normalUser.setRoles(Set.of(userRole));
-
-            userRepository.save(normalUser);
-            System.out.println("--> Created Default User");
-        }
-
-        System.out.println("=== DataInitializer: Roles and default users are set up successfully ===");
     }
 }

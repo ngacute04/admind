@@ -1,20 +1,19 @@
 package com.example.usermanagement.entity;
 
-import java.util.Set;
+import jakarta.persistence.*;
+import lombok.*;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -27,29 +26,33 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    private boolean enabled = true;
+    @Column(name = "full_name")
+    private String fullName;
 
+    private String phone;
+
+    private String avatarUrl; // Link ảnh đại diện (Cloudinary)
+
+    private boolean enabled = true; // Cho phép Admin khóa tài khoản nếu vi phạm
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    // ----- Mối quan hệ Phân quyền -----
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_roles",
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
-    // ===== Getter/Setter =====
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // ----- Mối quan hệ Mạng xã hội (Bài viết) -----
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Post> posts = new HashSet<>();
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-
-    public boolean isEnabled() { return enabled; }
-    public void setEnabled(boolean enabled) { this.enabled = enabled; }
-
-    public Set<Role> getRoles() { return roles; }
-    public void setRoles(Set<Role> roles) { this.roles = roles; }
+    // Gán Role nhanh
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
 }

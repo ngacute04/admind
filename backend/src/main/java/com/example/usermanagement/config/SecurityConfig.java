@@ -12,58 +12,59 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    // 1. Password Encoder dùng BCrypt
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 2. Cấu hình bảo mật
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
-            // 2.1 CSRF (nếu bạn dùng form login Thymeleaf, nên giữ enabled; nếu Ajax API mới disable)
-            .csrf(csrf -> csrf.disable()) // Nếu muốn production, hãy enable và thêm token
-
-            // 2.2 Phân quyền truy cập
+            .csrf(csrf -> csrf.disable()) // Vô hiệu hóa CSRF để thuận tiện cho gọi API từ React/Postman
             .authorizeHttpRequests(auth -> auth
-                // Cho phép truy cập công khai: login, forgot-password, static resources
-                .requestMatchers("/login", "/forgot-password", "/css/**", "/js/**", "/images/**").permitAll()
+                // 1. Tài nguyên tĩnh và xác thực không cần login
+                .requestMatchers("/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
                 
-                // Chỉ ADMIN mới truy cập được /admin/**
+                // 2. Mở cổng WebSocket cho Chat (rất quan trọng cho file WebSocketConfig bạn đã tạo)
+                .requestMatchers("/ws-redzone/**").permitAll()
+                
+                // 3. Phân quyền khu vực Admin (Bắt buộc phải có ROLE_ADMIN)
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 
-                // Tất cả URL còn lại phải đăng nhập
+                // 4. Mọi request khác đều phải đăng nhập
                 .anyRequest().authenticated()
             )
-
-            // 2.3 Cấu hình Form Login custom
             .formLogin(form -> form
-                .loginPage("/login")                   // Trang login custom
-                .usernameParameter("email")            // Lấy từ input name="email"
-                .passwordParameter("password")         // Lấy từ input name="password"
-                .defaultSuccessUrl("/admin", true)     // Redirect sau khi login thành công
-                .failureUrl("/login?error=true")       // Redirect khi login fail
-                .permitAll()                            // Cho phép tất cả truy cập login page
-            )
-
-            // 2.4 Cấu hình Logout
-            .logout(logout -> logout
-                .logoutUrl("/logout")                   // Endpoint logout
-                .logoutSuccessUrl("/login?logout")     // Redirect sau khi logout
-                .invalidateHttpSession(true)           // Hủy session
-                .deleteCookies("JSESSIONID")           // Xóa cookie session
+                .loginPage("/login")
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .successHandler((request, response, authentication) -> {
+                    // Logic điều hướng thông minh dựa trên Role
+                    var authorities = authentication.getAuthorities();
+                    boolean isAdmin = authorities.stream()
+                            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                    
+                    if (isAdmin) {
+                        response.sendRedirect("/admin/dashboard");
+                    } else {
+                        response.sendRedirect("/home"); // Redirect về trang mạng xã hội
+                    }
+                })
                 .permitAll()
             )
-
-            // 2.5 Remember-me (tuỳ chọn, nếu muốn nhớ login lâu)
-            // .rememberMe(r -> r
-            //     .key("uniqueAndSecret")
-            //     .tokenValiditySeconds(7 * 24 * 60 * 60) // 7 ngày
-            // )
-
-            ;
+            .exceptionHandling(exception -> exception
+                // Nếu User thường cố tình vào /admin, đá về trang home kèm cảnh báo
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.sendRedirect("/home?denied=true");
+                })
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
+            );
 
         return http.build();
     }

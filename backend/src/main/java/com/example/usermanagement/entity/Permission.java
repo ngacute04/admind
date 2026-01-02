@@ -6,22 +6,19 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "permissions")
+@Getter @Setter
+public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String name; // Ví dụ: ROLE_ADMIN, ROLE_USER
+    private String name; // Ví dụ: "ADMIN_VIEW_DASHBOARD", "ADMIN_MANAGE_ADS"
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "role_permissions",
-        joinColumns = @JoinColumn(name = "role_id"),
-        inverseJoinColumns = @JoinColumn(name = "permission_id")
-    )
-    private Set<Permission> permissions; // Chứa danh sách các quyền cụ thể
+    private String description; // Mô tả: Quyền xem bảng điều khiển, Quyền quản lý quảng cáo
 }

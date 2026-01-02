@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="content">
+    <div class="container-fluid mt-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Quản lý người dùng hệ thống RedZone</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Họ tên</th>
+                                <th>Email</th>
+                                <th>Quyền hạn</th>
+                                <th>Trạng thái</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${users}">
+                                <td th:text="${user.id}">1</td>
+                                <td th:text="${user.fullName}">Nguyễn Văn A</td>
+                                <td th:text="${user.email}">user@example.com</td>
+                                <td>
+                                    <span th:each="role : ${user.roles}" 
+                                          th:classappend="${role.name == 'ROLE_ADMIN' ? 'badge bg-danger' : 'badge bg-info'}"
+                                          th:text="${role.name}" class="me-1">
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:if="${user.enabled}" class="text-success"><i class="fas fa-check-circle"></i> Hoạt động</span>
+                                    <span th:unless="${user.enabled}" class="text-danger"><i class="fas fa-times-circle"></i> Bị khóa</span>
+                                </td>
+                                <td>
+                                    <button th:if="${!#lists.contains(user.roles.![name], 'ROLE_ADMIN')}"
+                                            th:onclick="'promoteUser(' + ${user.id} + ')'"
+                                            class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-user-shield"></i> Cấp Admin
+                                    </button>
+                                    
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-ban"></i> Khóa
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        function promoteUser(userId) {
+            if (confirm("Bạn có chắc chắn muốn cấp quyền Admin tối cao cho người này? \nHành động này không thể hoàn tác từ phía người dùng!")) {
+                
+                // Hiệu ứng chờ khi gọi API
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
+
+                fetch(`/api/admin/users/${userId}/promote`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // Nếu dùng Spring Security CSRF, bạn cần thêm token vào đây
+                    }
+                })
+                .then(async response => {
+                    if (response.ok) {
+                        alert("Thành công! Tài khoản này đã được thăng cấp Admin.");
+                        location.reload(); // Load lại trang để cập nhật danh sách và badge
+                    } else {
+                        const errorMsg = await response.text();
+                        alert("Lỗi: " + errorMsg);
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Đã xảy ra lỗi kết nối đến máy chủ.");
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                });
+            }
+        }
+    </script>
+</div>
+</html>
