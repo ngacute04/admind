@@ -83,7 +83,7 @@
     <div class="text-[9px] text-gray-500 uppercase tracking-widest mb-1 font-bold">Danh tính</div>
     <div class="input-group relative">
         <i class="fas fa-user main-icon"></i>
-        <input type="text" name="fullName" id="fullName" required placeholder="Họ và tên của bạn">
+        <input type="text" name="fullName" id="fullName" required placeholder="Họ và tên ">
     </div>
 
 <div class="grid grid-cols-3 gap-2">
@@ -129,7 +129,7 @@
     <div class="text-[9px] text-gray-500 uppercase tracking-widest mb-1 mt-4 font-bold">Bảo mật</div>
     <div class="input-group relative">
         <i class="fas fa-id-card main-icon"></i> 
-        <input type="text" name="email" id="contactInput" required placeholder="Email hoặc số điện thoại">
+        <input type="text" name="email" id="contactInput" required placeholder="số di động hoặc email">
     </div>
     <p id="contact-error" class="text-red-500 text-[10px] hidden mt-1 ml-2"></p>
 
@@ -173,8 +173,8 @@
 <script th:inline="javascript">
        document.addEventListener("DOMContentLoaded", () => {
     // Lấy dữ liệu từ Thymeleaf
-    const err = [[${errorMessage}]];
-    const ok = [[${successMessage}]];
+     const err = [[${errorMessage}]];
+     const ok = [[${successMessage}]];
 
     // Log ra console để kiểm tra xem dữ liệu có về đến máy khách không
     console.log("Error:", err);
