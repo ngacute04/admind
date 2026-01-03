@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
+
+
     <meta charset="UTF-8">
     <title>Đăng ký - RedZone</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -172,6 +174,13 @@
     cursor: pointer;
     margin-top: 1rem;
 }
+/* Chặn chọn văn bản cho toàn bộ khu vực chọn giới tính */
+.cursor-pointer, 
+.text-gray-500.uppercase {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none;     /* IE 10 và cũ hơn */
+    user-select: none;         /* Tiêu chuẩn (Chrome, Firefox, v.v.) */
+}
     </style>
 </head>
 <body class="flex items-center justify-center p-4 min-h-screen">
@@ -303,11 +312,7 @@
     <p id="confirm-error" class="text-red-500 text-[10px] hidden mt-1 ml-2"></p>
    
 
-<div th:if="${successMessage}" class="mb-4 p-3 rounded-xl bg-green-600/10 border border-green-600/20 text-center">
-    <p th:text="${successMessage}" class="text-green-500 text-[11px] font-bold uppercase tracking-widest">
-        Đăng ký thành công!
-    </p>
-</div>
+
 
     <div class="pt-4">
         <button type="submit" id="submitBtn" class="w-full py-4 rounded-2xl bg-red-700 text-white font-bold uppercase text-[10px] tracking-[0.3em] shadow-lg hover:bg-red-600 active:scale-95 transition-all">
@@ -351,7 +356,7 @@ particlesJS("particles-js", {
 });
 
 /* =========================================================
-   2. VARIABLES & ELEMENTS
+   2. VARIABLES
 ========================================================= */
 let isAgeValid = false;
 
@@ -373,17 +378,14 @@ const errors = {
 };
 
 /* =========================================================
-   3. MODAL HANDLERS
+   3. UI HELPERS
 ========================================================= */
-function showErrorModal(msg) {
-    if (!msg || msg === "null") return;
-    document.getElementById('errorMessage').innerText = msg;
-    document.getElementById('errorModal').style.display = 'flex';
-    resetSubmitButton();
-}
-
-function closeError() {
-    document.getElementById('errorModal').style.display = 'none';
+function togglePass(id, icon) {
+    const input = document.getElementById(id);
+    if (!input) return;
+    input.type = input.type === 'password' ? 'text' : 'password';
+    icon.classList.toggle('fa-eye');
+    icon.classList.toggle('fa-eye-slash');
 }
 
 function resetSubmitButton() {
@@ -392,23 +394,7 @@ function resetSubmitButton() {
     elements.submitBtn.style.pointerEvents = 'auto';
 }
 
-/* =========================================================
-   4. UI HELPERS
-========================================================= */
-function togglePass(id, icon) {
-    const input = document.getElementById(id);
-    if (!input) return;
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.replace('fa-eye', 'fa-eye-slash');
-    } else {
-        input.type = 'password';
-        icon.classList.replace('fa-eye-slash', 'fa-eye');
-    }
-}
-
 function toggleInputError(element, errorElement, message, isValid) {
-    if (!element || !errorElement) return;
     if (isValid || element.value === "") {
         errorElement.classList.add('hidden');
         element.style.borderColor = "rgba(255,255,255,0.08)";
@@ -420,176 +406,124 @@ function toggleInputError(element, errorElement, message, isValid) {
 }
 
 /* =========================================================
+   4. STATUS MODAL (GLOBAL)
+========================================================= */
+function openStatusModal(message, isSuccess = false) {
+    const modal = document.getElementById('statusModal');
+    const msg = document.getElementById('statusMsg');
+    const btn = document.getElementById('modalActionBtn');
+    const icon = document.getElementById('modalIcon');
+    const loginUrl = /*[[@{/login}]]*/ "/login";
+
+    if (!modal || !msg) return;
+
+    msg.innerText = message;
+    modal.style.display = 'flex';
+
+    if (isSuccess) {
+        icon.className = "fas fa-check-circle text-red-600 text-3xl";
+        btn.innerText = "Đăng nhập ngay";
+        btn.onclick = () => window.location.href = loginUrl;
+        setTimeout(() => window.location.href = loginUrl, 8000);
+    } else {
+        icon.className = "fas fa-exclamation-triangle text-red-600 text-3xl";
+        btn.innerText = "Tôi đã hiểu";
+        btn.onclick = () => {
+            modal.style.display = 'none';
+            resetSubmitButton();
+        };
+        setTimeout(() => modal.style.display = 'none', 7000);
+    }
+}
+
+/* =========================================================
    5. REAL-TIME VALIDATION
 ========================================================= */
 elements.contact.addEventListener('input', () => {
-    const val = elements.contact.value.trim();
-    const isValid =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) ||
-        /^0[35789][0-9]{8}$/.test(val);
-    toggleInputError(elements.contact, errors.contact, "Email hoặc SĐT không hợp lệ", isValid);
+    const v = elements.contact.value.trim();
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || /^0[35789][0-9]{8}$/.test(v);
+    toggleInputError(elements.contact, errors.contact, "Email hoặc SĐT không hợp lệ", ok);
 });
 
 elements.pass.addEventListener('input', () => {
-    const val = elements.pass.value;
-    const isValid = val.length >= 6 && /[a-zA-Z]/.test(val) && /[0-9]/.test(val);
-    toggleInputError(elements.pass, errors.pass, "Mật khẩu cần > 6 ký tự, gồm chữ và số", isValid);
+    const v = elements.pass.value;
+    const ok = v.length >= 6 && /[a-zA-Z]/.test(v) && /[0-9]/.test(v);
+    toggleInputError(elements.pass, errors.pass, "Mật khẩu cần chữ + số, ≥ 6 ký tự", ok);
 });
 
 elements.confirm.addEventListener('input', () => {
-    const isValid = elements.confirm.value === elements.pass.value;
-    toggleInputError(elements.confirm, errors.confirm, "Mật khẩu xác nhận không khớp", isValid);
+    toggleInputError(
+        elements.confirm,
+        errors.confirm,
+        "Mật khẩu xác nhận không khớp",
+        elements.confirm.value === elements.pass.value
+    );
 });
 
 /* =========================================================
-   6. DATE & AGE VALIDATION (>=16)
+   6. AGE VALIDATION
 ========================================================= */
-[elements.day, elements.month, elements.year].forEach(el => {
-    el.addEventListener('input', () => {
-        const d = parseInt(elements.day.value);
-        const m = parseInt(elements.month.value) - 1;
-        const y = parseInt(elements.year.value);
+[elements.day, elements.month, elements.year].forEach(() => {
+    [elements.day, elements.month, elements.year].forEach(el => {
+        el.addEventListener('input', () => {
+            const d = +elements.day.value;
+            const m = +elements.month.value - 1;
+            const y = +elements.year.value;
+            if (!d || isNaN(m) || !y) return;
 
-        if (!d || isNaN(m) || !y) return;
+            const date = new Date(y, m, d);
+            if (date.getFullYear() !== y || date.getMonth() !== m || date.getDate() !== d) {
+                toggleInputError(elements.day, errors.dob, "Ngày sinh không hợp lệ", false);
+                isAgeValid = false;
+                return;
+            }
 
-        const date = new Date(y, m, d);
-        const isValidDate =
-            date.getFullYear() === y &&
-            date.getMonth() === m &&
-            date.getDate() === d;
+            const age = new Date().getFullYear() - y -
+                (new Date().getMonth() < m ||
+                (new Date().getMonth() === m && new Date().getDate() < d));
 
-        if (!isValidDate) {
-            toggleInputError(elements.day, errors.dob, "Ngày sinh không hợp lệ", false);
-            isAgeValid = false;
-            return;
-        }
-
-        const today = new Date();
-        let age = today.getFullYear() - y;
-
-        if (today.getMonth() < m || (today.getMonth() === m && today.getDate() < d)) {
-            age--;
-        }
-
-        if (age < 16) {
-            toggleInputError(elements.day, errors.dob, "Bạn phải từ 16 tuổi trở lên", false);
-            isAgeValid = false;
-        } else {
-            toggleInputError(elements.day, errors.dob, "", true);
-            isAgeValid = true;
-        }
+            isAgeValid = age >= 16;
+            toggleInputError(elements.day, errors.dob, "Bạn phải từ 16 tuổi trở lên", isAgeValid);
+        });
     });
 });
 
 /* =========================================================
-   7. FORM SUBMIT VALIDATION
+   7. FORM SUBMIT
 ========================================================= */
 function validateForm() {
-    // 1. Kiểm tra Contact (Email/SĐT)
-    const contactVal = elements.contact.value.trim();
-    const contactValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactVal) || /^0[35789][0-9]{8}$/.test(contactVal);
-
-    // 2. Kiểm tra Mật khẩu (Chữ + Số, >= 6 ký tự)
-    const passVal = elements.pass.value;
-    const passValid = passVal.length >= 6 && /[a-zA-Z]/.test(passVal) && /[0-9]/.test(passVal);
-
-    // 3. Kiểm tra Xác nhận mật khẩu
-    const confirmValid = elements.confirm.value === passVal;
-
-    // 4. Kiểm tra Ngày sinh (Phải được hàm sự kiện input xác nhận trước đó)
-    // Nếu các ô ngày tháng năm có dữ liệu, hãy thử tính toán lại một lần nữa cho chắc chắn
-    if (!isAgeValid) {
-        // Chạy lại logic kiểm tra tuổi nhanh để tránh lỗi biến cờ chưa cập nhật
-        const d = parseInt(elements.day.value);
-        const m = parseInt(elements.month.value) - 1;
-        const y = parseInt(elements.year.value);
-        if (d && !isNaN(m) && y) {
-            const date = new Date(y, m, d);
-            const today = new Date();
-            let age = today.getFullYear() - y;
-            if (today.getMonth() < m || (today.getMonth() === m && today.getDate() < d)) age--;
-            isAgeValid = (age >= 16);
-        }
-    }
-
-    // CHẶN GỬI FORM NẾU CÓ LỖI
-    if (!contactValid) {
-        openStatusModal("Email hoặc Số điện thoại không hợp lệ.", false);
-        return false;
-    }
-    if (!passValid) {
-        openStatusModal("Mật khẩu phải từ 6 ký tự trở lên, bao gồm cả chữ và số.", false);
-        return false;
-    }
-    if (!confirmValid) {
-        openStatusModal("Mật khẩu xác nhận không trùng khớp.", false);
+    if (!document.querySelector('input[name="gender"]:checked')) {
+        openStatusModal("Vui lòng chọn giới tính của bạn.", false);
         return false;
     }
     if (!isAgeValid) {
-        openStatusModal("Bạn phải đủ 16 tuổi trở lên để tham gia RedZone.", false);
+        openStatusModal("Bạn phải đủ 16 tuổi trở lên.", false);
         return false;
     }
 
-    // NẾU TẤT CẢ ĐÚNG -> TIẾN HÀNH SUBMIT
-    elements.submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Đang xử lý...';
+    elements.submitBtn.innerHTML =
+        '<i class="fas fa-circle-notch fa-spin mr-2"></i> Đang xử lý...';
     elements.submitBtn.style.pointerEvents = 'none';
     return true;
 }
+
 /* =========================================================
-   8. XỬ LÝ THÔNG BÁO TỪ BACKEND (CHUYÊN NGHIỆP)
+   8. BACKEND MESSAGE
 ========================================================= */
-document.addEventListener("DOMContentLoaded", function () {
-    // Lấy dữ liệu từ Thymeleaf
-    const serverError = /*[[${errorMessage}]]*/ null;
-    const serverSuccess = /*[[${successMessage}]]*/ null;
-    const loginUrl = /*[[@{/login}]]*/ "/login";
+document.addEventListener("DOMContentLoaded", () => {
+    const err = /*[[${errorMessage}]]*/ null;
+    const ok = /*[[${successMessage}]]*/ null;
 
-    const statusModal = document.getElementById('statusModal');
-    const statusMsg = document.getElementById('statusMsg');
-    const modalActionBtn = document.getElementById('modalActionBtn');
-    const modalIcon = document.getElementById('modalIcon');
-
-    // Hàm mở Modal tập trung
-    function openStatusModal(message, isSuccess = false) {
-        if (!statusModal || !statusMsg) return;
-
-        statusMsg.innerText = message;
-        // Ép hiển thị Flex để căn giữa
-        statusModal.style.display = 'flex';
-
-        if (isSuccess) {
-            // Cấu hình giao diện THÀNH CÔNG
-            modalIcon.className = "fas fa-check-circle text-red-600 text-3xl";
-            modalActionBtn.innerText = "Đăng nhập ngay";
-            modalActionBtn.style.display = "block";
-            modalActionBtn.onclick = () => { window.location.href = loginUrl; };
-            
-            // Tự động chuyển hướng sau 3 giây
-            setTimeout(() => { window.location.href = loginUrl; }, 5000);
-        } else {
-            // Cấu hình giao diện LỖI
-            modalIcon.className = "fas fa-exclamation-triangle text-red-600 text-3xl";
-            modalActionBtn.innerText = "Tôi đã hiểu";
-            modalActionBtn.style.display = "block";
-            modalActionBtn.onclick = () => { statusModal.style.display = 'none'; };
-            
-            // Tự động đóng sau 3 giây
-            setTimeout(() => { statusModal.style.display = 'none'; }, 4000);
-        }
-    }
-
-    // Kiểm tra và hiển thị Lỗi
-    if (serverError && serverError !== "null" && serverError.trim() !== "") {
-        openStatusModal(serverError, false);
-    }
-
-    // Kiểm tra và hiển thị Thành công
-    if (serverSuccess && serverSuccess !== "null" && serverSuccess.trim() !== "") {
-        if (elements.submitBtn) elements.submitBtn.style.pointerEvents = 'none';
-        openStatusModal(serverSuccess, true);
+    // Kiểm tra sessionStorage để hiển thị 1 lần
+    if (!sessionStorage.getItem("modalShown")) {
+        if (err) openStatusModal(err, false);
+        if (ok) openStatusModal(ok, true);
+        sessionStorage.setItem("modalShown", "true"); // đánh dấu đã hiển thị
     }
 });
+
 </script>
+
 
 </body>
 </html>
