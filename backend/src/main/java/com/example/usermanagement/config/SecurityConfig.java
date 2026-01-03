@@ -20,26 +20,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Vô hiệu hóa CSRF để thuận tiện cho gọi API từ React/Postman
+            .csrf(csrf -> csrf.disable()) // Tắt CSRF để làm Chat và API mượt hơn
             .authorizeHttpRequests(auth -> auth
-                // 1. Tài nguyên tĩnh và xác thực không cần login
-                .requestMatchers("/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
+                // 1. Công khai các trang Auth, CSS, JS, Image và WebSocket
+                .requestMatchers("/login", "/register", "/css/**", "/js/**", "/images/**", "/ws-redzone/**").permitAll()
                 
-                // 2. Mở cổng WebSocket cho Chat (rất quan trọng cho file WebSocketConfig bạn đã tạo)
-                .requestMatchers("/ws-redzone/**").permitAll()
-                
-                // 3. Phân quyền khu vực Admin (Bắt buộc phải có ROLE_ADMIN)
+                // 2. KHÓA CHẶT ADMIN: Chỉ ai có ROLE_ADMIN mới được đi qua cổng này
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 
-                // 4. Mọi request khác đều phải đăng nhập
+                // 3. Mọi trang còn lại phải Login mới xem được
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .usernameParameter("email")
+                .usernameParameter("email") // Đây là input name="email" từ form login
                 .passwordParameter("password")
                 .successHandler((request, response, authentication) -> {
-                    // Logic điều hướng thông minh dựa trên Role
+                    // Logic điều hướng sau khi đăng nhập thành công
                     var authorities = authentication.getAuthorities();
                     boolean isAdmin = authorities.stream()
                             .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
@@ -47,15 +44,16 @@ public class SecurityConfig {
                     if (isAdmin) {
                         response.sendRedirect("/admin/dashboard");
                     } else {
-                        response.sendRedirect("/home"); // Redirect về trang mạng xã hội
+                        // Người dùng thường sau khi đăng ký/đăng nhập sẽ luôn về /home
+                        response.sendRedirect("/home");
                     }
                 })
                 .permitAll()
             )
             .exceptionHandling(exception -> exception
-                // Nếu User thường cố tình vào /admin, đá về trang home kèm cảnh báo
+                // Nếu User thường cố tình gõ /admin trên thanh địa chỉ -> Đá về /home
                 .accessDeniedHandler((request, response, accessDeniedException) -> {
-                    response.sendRedirect("/home?denied=true");
+                    response.sendRedirect("/home?error=no_permission");
                 })
             )
             .logout(logout -> logout

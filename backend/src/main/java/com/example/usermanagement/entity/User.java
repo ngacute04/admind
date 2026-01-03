@@ -23,22 +23,26 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(unique = true) // SĐT là duy nhất để dùng đăng nhập
+    private String phone;
+
     @Column(nullable = false)
     private String password;
 
     @Column(name = "full_name")
     private String fullName;
 
-    private String phone;
+    private String gender; 
 
-    private String avatarUrl; // Link ảnh đại diện (Cloudinary)
+    private String birthday;
 
-    private boolean enabled = true; // Cho phép Admin khóa tài khoản nếu vi phạm
+    private String avatarUrl;
+
+    private boolean enabled = true;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // ----- Mối quan hệ Phân quyền -----
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_roles",
@@ -47,12 +51,13 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
-    // ----- Mối quan hệ Mạng xã hội (Bài viết) -----
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Post> posts = new HashSet<>();
 
-    // Gán Role nhanh
     public void addRole(Role role) {
+        if (this.roles == null) {
+            this.roles = new HashSet<>();
+        }
         this.roles.add(role);
     }
 }

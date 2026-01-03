@@ -13,22 +13,20 @@
         body { background: var(--dark-bg); font-family: 'Plus Jakarta Sans', sans-serif; color: #f5f5f5; min-height: 100vh; margin: 0; overflow-x: hidden; }
         #particles-js { position: fixed; width: 100%; height: 100%; z-index: -1; }
         .bg-glow { position: fixed; width: 600px; height: 600px; background: radial-gradient(circle, rgba(185, 28, 28, 0.15) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; filter: blur(80px); z-index: -1; }
-      /* Tối ưu Footer cho mobile */
-       .footer-fixed {
-    /* Đưa về vị trí tuyệt đối ở đáy */
-    position: absolute; 
-    bottom: 1rem; /* Khoảng cách từ chữ đến mép dưới màn hình (chỉnh số này nhỏ đi nếu muốn thấp hơn nữa) */
-    left: 50%;
-    transform: translateX(-50%);
-    
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.3   rem; /* Thu nhỏ khoảng cách giữa 2 dòng chữ */
-    z-index: 20;
-    width: 100%;
-}
-        /* Giữ nguyên Card - Bỏ hiệu ứng Hover dịch chuyển theo yêu cầu */
+
+        .footer-fixed {
+            position: absolute; 
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+            z-index: 20;
+            width: 100%;
+        }
+
         #registerCard {
             background: rgba(10, 10, 10, 0.65);
             backdrop-filter: blur(30px);
@@ -41,16 +39,25 @@
             flex-direction: column;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-        .highlight-text {
-    background: linear-gradient(90deg, #fff, #ef4444); /* Màu từ trắng sang đỏ */
-    -webkit-background-clip: text; /* Cắt nền theo hình chữ */
-    -webkit-text-fill-color: transparent; /* Làm rỗng ruột chữ để hiện nền gradient */
-}
-  
 
-        .form-scroller { flex: 1; overflow-y: auto; padding: 0 1.5rem 1.5rem 1.5rem; max-height: 75vh; }
-        .form-scroller::-webkit-scrollbar { width: 3px; }
-        .form-scroller::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 10px; }
+        .highlight-text {
+            background: linear-gradient(90deg, #fff, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Ẩn thanh cuộn nhưng vẫn cho phép cuộn */
+         .form-scroller { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 0 1.5rem 1.5rem 1.5rem; 
+            max-height: 75vh; 
+            -ms-overflow-style: none;  /* IE & Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .form-scroller::-webkit-scrollbar { 
+            display: none;  /* Chrome, Safari, Opera */
+        }
 
         .input-group input, .input-group select {
             background: rgba(255, 255, 255, 0.03) !important;
@@ -65,85 +72,125 @@
         .input-group i.main-icon { font-size: 14px; color: #4b5563; position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); }
         .input-group input:focus { border-color: var(--primary-red) !important; background: rgba(185,28,28,0.05) !important; }
 
-        /* Modal Thông báo chuẩn giao diện */
-        #errorModal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(15px);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+        /* Modal Thông báo */
+        
 
-        /* Responsive tinh chỉnh */
         @media (max-width: 1024px) {
-            .desktop-sidebar { display:   none !important; }
+            .desktop-sidebar { display: none !important; }
             .mobile-brand { display: block !important; }
             body { overflow-y: auto; }
         }
-        /* CHỈ THÊM: Thu nhỏ tỷ lệ trên thiết bị có màn hình nhỏ */
-@media (max-width: 640px) {
-    /* Thu nhỏ toàn bộ Form */
-    #registerCard {
-        transform: scale(0.9); /* Thu nhỏ toàn bộ card xuống còn 90% */
-        transform-origin: top center; /* Thu nhỏ từ phía trên để không tạo khoảng trống */
-        margin-top: -10px; /* Nhích lên trên một chút */
-    }
 
-    /* Thu nhỏ các tiêu đề chính */
-    #registerCard h3 {
-        font-size: 1.25rem !important; /* Chữ Tạo Tài Khoản nhỏ lại */
-    }
+        /* TỐI ƯU MẠNH CHO MÀN HÌNH NHỎ / NGẮN */
+        @media (max-width: 640px) {
+            /* Thu nhỏ toàn bộ card form linh hoạt theo chiều cao màn hình */
+            #registerCard {
+                transform-origin: top center;
+                transform: scale(calc(0.75 + (100vh - 500px) / 1000)); /* Nhỏ nhất ~75% khi màn rất ngắn, lớn dần khi màn cao hơn */
+                margin-top: -10px;
+                max-height: 95vh; /* Đảm bảo không vượt quá màn hình */
+            }
 
-    /* Thu nhỏ các nhãn và ô nhập liệu */
-    .text-\[9px\] {
-        font-size: 8px !important; /* Các chữ nhỏ "Danh tính", "Bảo mật" nhỏ lại */
-    }
+            #registerCard h3 {
+                font-size: 1.25rem !important;
+            }
 
-    .input-group input, 
-    .input-group select {
-        padding-top: 0.6rem !important;
-        padding-bottom: 0.6rem !important;
-        font-size: 14px !important; /* Thu nhỏ chữ trong ô nhập */
-    }
+            .text-\[9px\] {
+                font-size: 8px !important;
+            }
 
-    /* Thu nhỏ nút bấm */
-    #submitBtn {
-        padding-top: 0.75rem !important;
-        padding-bottom: 0.75rem !important;
-        font-size: 9px !important;
-    }
+            .input-group input, 
+            .input-group select {
+                padding-top: 0.6rem !important;
+                padding-bottom: 0.6rem !important;
+                font-size: 14px !important;
+            }
 
-    /* Thu nhỏ Logo RedZone trên mobile */
-    .lg\:hidden h1 {
-        font-size: 2.5rem !important;
-        margin-bottom: 0.5rem !important;
-    }
+            #submitBtn {
+                padding-top: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
+                font-size: 9px !important;
+            }
 
-    /* Thu nhỏ Footer */
-    .footer-fixed p {
-        font-size: 8px !important;
-    }
+            .lg\:hidden h1 {
+                font-size: 2.5rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+
+            .footer-fixed p {
+                font-size: 8px !important;
+            }
+
+           
+        }
+  /* Overlay che mờ toàn bộ màn hình - ÉP ĐỘ ƯU TIÊN CAO NHẤT */
+#statusModal {
+    display: none; /* Mặc định ẩn */
+    position: fixed !important; /* Luôn cố định bất kể body là flex hay gì */
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 99999 !important; /* Nằm trên tất cả mọi thứ */
+    background: rgba(0, 0, 0, 0.7); /* Làm tối nền mạnh hơn */
+    backdrop-filter: blur(25px) saturate(150%); /* Che mờ sâu và tăng độ bão hòa màu */
+    -webkit-backdrop-filter: blur(25px) saturate(150%);
+    align-items: center;
+    justify-content: center;
+}
+
+/* Khung nội dung Modal */
+.modal-content {
+    background: #0a0a0a;
+    border: 1px solid rgba(185, 28, 28, 0.4);
+    padding: 3rem 2rem;
+    border-radius: 2.5rem;
+    max-width: 400px;
+    width: 90%; /* Co giãn trên mobile */
+    text-align: center;
+    box-shadow: 0 0 50px rgba(185, 28, 28, 0.2);
+    animation: modalShow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalShow {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.btn-modal {
+    background: #b91c1c;
+    color: white;
+    width: 100%;
+    padding: 1rem;
+    border-radius: 1.25rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    margin-top: 1rem;
 }
     </style>
 </head>
 <body class="flex items-center justify-center p-4 min-h-screen">
 
-    <div id="errorModal">
-        <div class="bg-[#0f0f0f] border border-red-600/30 p-8 rounded-[2.5rem] max-w-sm w-full text-center shadow-2xl">
-            <div class="w-14 h-14 bg-red-600/10 border border-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-user-shield text-red-600 text-xl"></i>
-            </div>
-            <h4 class="text-white font-bold mb-2 uppercase text-sm tracking-widest">Xác thực hệ thống</h4>
-            <p id="errorMessage" class="text-gray-400 text-xs mb-6 leading-relaxed"></p>
-            <button onclick="closeError()" class="w-full py-3 bg-red-700 hover:bg-red-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">
-                Tôi đã hiểu
-            </button>
+  <div id="statusModal">
+    <div class="modal-content">
+        <div class="w-20 h-20 bg-red-600/10 border border-red-600/40 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(185,28,28,0.2)]">
+            <i id="modalIcon" class="fas fa-shield-alt text-red-600 text-3xl"></i>
         </div>
+        
+        <h4 class="text-white font-bold mb-3 uppercase text-base tracking-[0.2em]">RedZone System</h4>
+        
+        <p id="statusMsg" class="text-red-500 text-[13px] mb-10 leading-relaxed font-semibold px-4"></p>
+        
+        <button id="modalActionBtn" class="btn-modal">
+            Đăng nhập ngay
+        </button>
     </div>
+</div>
 
     <div id="particles-js"></div>
     <div class="bg-glow" style="top: -10%; left: -10%;"></div>
@@ -179,83 +226,95 @@
                     </div>
                 </div>
             </div>
-
-           
         </div>
 
-               <div class="lg:col-span-6 flex flex-col items-center w-full">
-            
-            <div class="lg:col-span-6 flex flex-col items-center justify-center relative w-full">
-           <div class="lg:hidden text-center mb-8">
+        <div class="lg:col-span-6 flex flex-col items-center w-full">
+            <div class="lg:hidden text-center mb-8">
                 <h1 class="text-5xl font-extrabold tracking-tighter ">Red<span class="text-red-600">Zone</span></h1>
                 <p class="text-gray-500 text-[9px] uppercase tracking-[4px] mt-1">Chỉ một bước nhỏ để tận hưởng thế giới của bạn</p>
             </div>  
-              <div id="registerCard">
+            <div id="registerCard">
                 <div class="p-6 pb-2 text-center">
                     <h3 class="text-2xl font-bold uppercase tracking-normal text-white">Tạo Tài Khoản</h3>
                     <div class="h-1 w-8 bg-red-600 mx-auto mt-2 shadow-[0_0_10px_#b91c1c]"></div>
-                </div> 
+                </div>  
 
-
-                
                 <div class="form-scroller">
                     <form th:action="@{/register}" method="POST" class="space-y-3" onsubmit="return validateForm()">
-                        
-                        <div class="text-[9px] text-gray-500 uppercase tracking-widest mb-1 font-bold">Danh tính</div>
-                        <div class="input-group relative">
-                            <i class="fas fa-user main-icon"></i>
-                            <input type="text" name="fullName" required placeholder="Họ và tên của bạn">
-                        </div>
+    
+    <div class="text-[9px] text-gray-500 uppercase tracking-widest mb-1 font-bold">Danh tính</div>
+    <div class="input-group relative">
+        <i class="fas fa-user main-icon"></i>
+        <input type="text" name="fullName" id="fullName" required placeholder="Họ và tên của bạn">
+    </div>
 
-                        <div class="grid grid-cols-3 gap-3">
-                            <div class="input-group relative">
-                                <i class="fas fa-calendar-day main-icon"></i>
-                                <input type="number" name="dob_day" id="dob_day" placeholder="Ngày" min="1" max="31" required>
-                            </div>
-                            <div class="input-group relative">
-                                <input type="number" name="dob_month" id="dob_month" placeholder="Tháng" min="1" max="12" required>
-                            </div>
-                            <div class="input-group relative">
-                                <input type="number" name="dob_year" id="dob_year" placeholder="Năm" min="1900" max="2026" required>
-                            </div>
-                        </div>
+    <div class="grid grid-cols-3 gap-3">
+        <div class="input-group relative">
+            <i class="fas fa-calendar-day main-icon"></i>
+            <input type="number" name="dob_day" id="dob_day" placeholder="Ngày" min="1" max="31" required>
+        </div>
+        <div class="input-group relative">
+            <input type="number" name="dob_month" id="dob_month" placeholder="Tháng" min="1" max="12" required>
+        </div>
+        <div class="input-group relative">
+            <input type="number" name="dob_year" id="dob_year" placeholder="Năm" min="1900" max="2026" required>
+        </div>
+    </div>
+    <p id="dob-error" class="text-red-500 text-[10px] hidden mt-1 ml-2"></p>
 
-                        <div class="input-group relative">
-                            <i class="fas fa-venus-mars main-icon"></i>
-                            <select name="gender" class="appearance-none" required>
-                                <option value="" disabled selected>Giới tính</option>
-                                <option value="male">Nam</option>
-                                <option value="female">Nữ</option>
-                            </select>
-                        </div>
+   <div class="text-[9px] text-gray-500 uppercase tracking-widest mb-1.5 mt-4 font-bold ml-1">Giới tính</div>
+<div class="flex gap-2">
+    <label class="flex-1 cursor-pointer group">
+        <input type="radio" name="gender" value="Nam" class="hidden peer" required>
+        <div class="py-2.5 px-3 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center gap-2 transition-all peer-checked:border-red-600 peer-checked:bg-red-600/10 hover:bg-white/10">
+            <i class="fas fa-mars text-gray-500 peer-checked:text-red-500 text-xs transition-colors"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 peer-checked:text-white">Nam</span>
+        </div>
+    </label>
 
-                        <div class="text-[9px] text-gray-500 uppercase tracking-widest mb-1 mt-4 font-bold">Bảo mật</div>
-                        <div class="input-group relative">
-                            <i class="fas fa-at main-icon"></i>
-                            <input type="email" name="email" required placeholder="Địa chỉ email hợp lệ">
-                        </div>
+    <label class="flex-1 cursor-pointer group">
+        <input type="radio" name="gender" value="Nữ" class="hidden peer">
+        <div class="py-2.5 px-3 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center gap-2 transition-all peer-checked:border-red-600 peer-checked:bg-red-600/10 hover:bg-white/10">
+            <i class="fas fa-venus text-gray-500 peer-checked:text-red-500 text-xs transition-colors"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 peer-checked:text-white">Nữ</span>
+        </div>
+    </label>
+</div>
 
-                        <div class="input-group relative">
-                            <i class="fas fa-shield-alt main-icon"></i>
-                            <input type="password" name="password" id="password" required placeholder="Mật khẩu tài khoản">
-                            <i class="fas fa-eye absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-600 text-[10px]" onclick="togglePass('password', this)"></i>
-                        </div>
+    <div class="text-[9px] text-gray-500 uppercase tracking-widest mb-1 mt-4 font-bold">Bảo mật</div>
+    <div class="input-group relative">
+        <i class="fas fa-id-card main-icon"></i> 
+        <input type="text" name="email" id="contactInput" required placeholder="Email hoặc số điện thoại">
+    </div>
+    <p id="contact-error" class="text-red-500 text-[10px] hidden mt-1 ml-2"></p>
 
-                        <div class="input-group relative">
-                            <i class="fas fa-check-circle main-icon"></i>
-                            <input type="password" id="confirm_password" required placeholder="Xác nhận lại mật khẩu">
-                            <i class="fas fa-eye absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-600 text-[10px]" onclick="togglePass('confirm_password', this)"></i>
-                        </div>
+    <div class="input-group relative">
+        <i class="fas fa-shield-alt main-icon"></i>
+        <input type="password" name="password" id="password" required placeholder="Mật khẩu">
+        <i class="fas fa-eye absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-600 text-[10px]" onclick="togglePass('password', this)"></i>
+    </div>
+    <p id="password-error" class="text-red-500 text-[10px] hidden mt-1 ml-2"></p>
 
-       
+    <div class="input-group relative">
+        <i class="fas fa-check-circle main-icon"></i>
+        <input type="password" id="confirm_password" required placeholder="Xác nhận lại mật khẩu">
+        <i class="fas fa-eye absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-600 text-[10px]" onclick="togglePass('confirm_password', this)"></i>
+    </div>
+    <p id="confirm-error" class="text-red-500 text-[10px] hidden mt-1 ml-2"></p>
+   
 
-                        <div class="pt-4">
-                            <button type="submit" id="submitBtn" class="w-full py-4 rounded-2xl bg-red-700 text-white font-bold uppercase text-[10px] tracking-[0.3em] shadow-lg hover:bg-red-600 active:scale-95 transition-all">
-                                tạo tài khoản
-                            </button>
-                        </div>
-                    </form>
+<div th:if="${successMessage}" class="mb-4 p-3 rounded-xl bg-green-600/10 border border-green-600/20 text-center">
+    <p th:text="${successMessage}" class="text-green-500 text-[11px] font-bold uppercase tracking-widest">
+        Đăng ký thành công!
+    </p>
+</div>
 
+    <div class="pt-4">
+        <button type="submit" id="submitBtn" class="w-full py-4 rounded-2xl bg-red-700 text-white font-bold uppercase text-[10px] tracking-[0.3em] shadow-lg hover:bg-red-600 active:scale-95 transition-all">
+            tạo tài khoản
+        </button>
+    </div>
+</form>
                     <div class="text-center mt-6">
                         <a th:href="@{/login}" class="text-[10px] md:text-[11px] text-red-500 font-bold hover:text-red-700 transition-colors uppercase tracking-widest no-underline">
                             Đã có tài khoản? Đăng nhập
@@ -269,78 +328,268 @@
         
         <p class="text-[9px] text-gray-700 tracking-[0.2em] md:tracking-[0.3em] uppercase text-center">© 2026 RedZone Hệ thống kết nối</p>
     </footer>
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script th:inline="javascript">
+/* =========================================================
+   1. PARTICLES EFFECT
+========================================================= */
+particlesJS("particles-js", {
+    particles: {
+        number: { value: 35 },
+        color: { value: "#b91c1c" },
+        opacity: { value: 0.15 },
+        size: { value: 2 },
+        line_linked: {
+            enable: true,
+            distance: 150,
+            color: "#b91c1c",
+            opacity: 0.1,
+            width: 1
+        },
+        move: { enable: true, speed: 0.8 }
+    }
+});
 
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        particlesJS("particles-js", {
-            "particles": {
-                "number": { "value": 35 },
-                "color": { "value": "#b91c1c" },
-                "opacity": { "value": 0.15 },
-                "size": { "value": 2 },
-                "line_linked": { "enable": true, "distance": 150, "color": "#b91c1c", "opacity": 0.1, "width": 1 },
-                "move": { "enable": true, "speed": 0.8 }
-            }
-        });
+/* =========================================================
+   2. VARIABLES & ELEMENTS
+========================================================= */
+let isAgeValid = false;
 
-        function togglePass(id, icon) {
-            const input = document.getElementById(id);
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.replace('fa-eye', 'fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.replace('fa-eye-slash', 'fa-eye');
-            }
+const elements = {
+    contact: document.getElementById('contactInput'),
+    pass: document.getElementById('password'),
+    confirm: document.getElementById('confirm_password'),
+    day: document.getElementById('dob_day'),
+    month: document.getElementById('dob_month'),
+    year: document.getElementById('dob_year'),
+    submitBtn: document.getElementById('submitBtn')
+};
+
+const errors = {
+    contact: document.getElementById('contact-error'),
+    pass: document.getElementById('password-error'),
+    confirm: document.getElementById('confirm-error'),
+    dob: document.getElementById('dob-error')
+};
+
+/* =========================================================
+   3. MODAL HANDLERS
+========================================================= */
+function showErrorModal(msg) {
+    if (!msg || msg === "null") return;
+    document.getElementById('errorMessage').innerText = msg;
+    document.getElementById('errorModal').style.display = 'flex';
+    resetSubmitButton();
+}
+
+function closeError() {
+    document.getElementById('errorModal').style.display = 'none';
+}
+
+function resetSubmitButton() {
+    if (!elements.submitBtn) return;
+    elements.submitBtn.innerHTML = 'Tạo tài khoản';
+    elements.submitBtn.style.pointerEvents = 'auto';
+}
+
+/* =========================================================
+   4. UI HELPERS
+========================================================= */
+function togglePass(id, icon) {
+    const input = document.getElementById(id);
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+
+function toggleInputError(element, errorElement, message, isValid) {
+    if (!element || !errorElement) return;
+    if (isValid || element.value === "") {
+        errorElement.classList.add('hidden');
+        element.style.borderColor = "rgba(255,255,255,0.08)";
+    } else {
+        errorElement.innerText = message;
+        errorElement.classList.remove('hidden');
+        element.style.borderColor = "#b91c1c";
+    }
+}
+
+/* =========================================================
+   5. REAL-TIME VALIDATION
+========================================================= */
+elements.contact.addEventListener('input', () => {
+    const val = elements.contact.value.trim();
+    const isValid =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) ||
+        /^0[35789][0-9]{8}$/.test(val);
+    toggleInputError(elements.contact, errors.contact, "Email hoặc SĐT không hợp lệ", isValid);
+});
+
+elements.pass.addEventListener('input', () => {
+    const val = elements.pass.value;
+    const isValid = val.length >= 6 && /[a-zA-Z]/.test(val) && /[0-9]/.test(val);
+    toggleInputError(elements.pass, errors.pass, "Mật khẩu cần > 6 ký tự, gồm chữ và số", isValid);
+});
+
+elements.confirm.addEventListener('input', () => {
+    const isValid = elements.confirm.value === elements.pass.value;
+    toggleInputError(elements.confirm, errors.confirm, "Mật khẩu xác nhận không khớp", isValid);
+});
+
+/* =========================================================
+   6. DATE & AGE VALIDATION (>=16)
+========================================================= */
+[elements.day, elements.month, elements.year].forEach(el => {
+    el.addEventListener('input', () => {
+        const d = parseInt(elements.day.value);
+        const m = parseInt(elements.month.value) - 1;
+        const y = parseInt(elements.year.value);
+
+        if (!d || isNaN(m) || !y) return;
+
+        const date = new Date(y, m, d);
+        const isValidDate =
+            date.getFullYear() === y &&
+            date.getMonth() === m &&
+            date.getDate() === d;
+
+        if (!isValidDate) {
+            toggleInputError(elements.day, errors.dob, "Ngày sinh không hợp lệ", false);
+            isAgeValid = false;
+            return;
         }
 
-        function showError(msg) {
-            document.getElementById('errorMessage').innerText = msg;
-            document.getElementById('errorModal').style.display = 'flex';
+        const today = new Date();
+        let age = today.getFullYear() - y;
+
+        if (today.getMonth() < m || (today.getMonth() === m && today.getDate() < d)) {
+            age--;
         }
 
-        function closeError() {
-            document.getElementById('errorModal').style.display = 'none';
+        if (age < 16) {
+            toggleInputError(elements.day, errors.dob, "Bạn phải từ 16 tuổi trở lên", false);
+            isAgeValid = false;
+        } else {
+            toggleInputError(elements.day, errors.dob, "", true);
+            isAgeValid = true;
         }
+    });
+});
 
-        function validateForm() {
-            const day = parseInt(document.getElementById('dob_day').value);
-            const month = parseInt(document.getElementById('dob_month').value) - 1;
-            const year = parseInt(document.getElementById('dob_year').value);
-            const pass = document.getElementById('password').value;
-            const confirmPass = document.getElementById('confirm_password').value;
+/* =========================================================
+   7. FORM SUBMIT VALIDATION
+========================================================= */
+function validateForm() {
+    // 1. Kiểm tra Contact (Email/SĐT)
+    const contactVal = elements.contact.value.trim();
+    const contactValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactVal) || /^0[35789][0-9]{8}$/.test(contactVal);
 
-            // Kiểm tra ngày thực tế
-            const dob = new Date(year, month, day);
-            if (dob.getFullYear() !== year || dob.getMonth() !== month || dob.getDate() !== day) {
-                showError("Ngày sinh bạn nhập không tồn tại. Vui lòng kiểm tra lại.");
-                return false;
-            }
+    // 2. Kiểm tra Mật khẩu (Chữ + Số, >= 6 ký tự)
+    const passVal = elements.pass.value;
+    const passValid = passVal.length >= 6 && /[a-zA-Z]/.test(passVal) && /[0-9]/.test(passVal);
 
-            // Kiểm tra 16 tuổi (Tính theo năm 2026)
+    // 3. Kiểm tra Xác nhận mật khẩu
+    const confirmValid = elements.confirm.value === passVal;
+
+    // 4. Kiểm tra Ngày sinh (Phải được hàm sự kiện input xác nhận trước đó)
+    // Nếu các ô ngày tháng năm có dữ liệu, hãy thử tính toán lại một lần nữa cho chắc chắn
+    if (!isAgeValid) {
+        // Chạy lại logic kiểm tra tuổi nhanh để tránh lỗi biến cờ chưa cập nhật
+        const d = parseInt(elements.day.value);
+        const m = parseInt(elements.month.value) - 1;
+        const y = parseInt(elements.year.value);
+        if (d && !isNaN(m) && y) {
+            const date = new Date(y, m, d);
             const today = new Date();
-            let age = today.getFullYear() - year;
-            const m = today.getMonth() - month;
-            if (m < 0 || (m === 0 && today.getDate() < day)) { age--; }
-
-            if (age < 16) {
-                showError("Bạn chưa đủ 16 tuổi. RedZone chỉ dành cho người dùng trưởng thành để đảm bảo an toàn nội dung.");
-                return false;
-            }
-
-            // Kiểm tra mật khẩu
-            if (pass !== confirmPass) {
-                showError("Mật khẩu xác nhận không trùng khớp với mật khẩu đã nhập.");
-                return false;
-            }
-
-            // Loading
-            const btn = document.getElementById('submitBtn');
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Đang xác thực...';
-            btn.style.pointerEvents = 'none';
-
-            return true;
+            let age = today.getFullYear() - y;
+            if (today.getMonth() < m || (today.getMonth() === m && today.getDate() < d)) age--;
+            isAgeValid = (age >= 16);
         }
-    </script>
+    }
+
+    // CHẶN GỬI FORM NẾU CÓ LỖI
+    if (!contactValid) {
+        openStatusModal("Email hoặc Số điện thoại không hợp lệ.", false);
+        return false;
+    }
+    if (!passValid) {
+        openStatusModal("Mật khẩu phải từ 6 ký tự trở lên, bao gồm cả chữ và số.", false);
+        return false;
+    }
+    if (!confirmValid) {
+        openStatusModal("Mật khẩu xác nhận không trùng khớp.", false);
+        return false;
+    }
+    if (!isAgeValid) {
+        openStatusModal("Bạn phải đủ 16 tuổi trở lên để tham gia RedZone.", false);
+        return false;
+    }
+
+    // NẾU TẤT CẢ ĐÚNG -> TIẾN HÀNH SUBMIT
+    elements.submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Đang xử lý...';
+    elements.submitBtn.style.pointerEvents = 'none';
+    return true;
+}
+/* =========================================================
+   8. XỬ LÝ THÔNG BÁO TỪ BACKEND (CHUYÊN NGHIỆP)
+========================================================= */
+document.addEventListener("DOMContentLoaded", function () {
+    // Lấy dữ liệu từ Thymeleaf
+    const serverError = /*[[${errorMessage}]]*/ null;
+    const serverSuccess = /*[[${successMessage}]]*/ null;
+    const loginUrl = /*[[@{/login}]]*/ "/login";
+
+    const statusModal = document.getElementById('statusModal');
+    const statusMsg = document.getElementById('statusMsg');
+    const modalActionBtn = document.getElementById('modalActionBtn');
+    const modalIcon = document.getElementById('modalIcon');
+
+    // Hàm mở Modal tập trung
+    function openStatusModal(message, isSuccess = false) {
+        if (!statusModal || !statusMsg) return;
+
+        statusMsg.innerText = message;
+        // Ép hiển thị Flex để căn giữa
+        statusModal.style.display = 'flex';
+
+        if (isSuccess) {
+            // Cấu hình giao diện THÀNH CÔNG
+            modalIcon.className = "fas fa-check-circle text-red-600 text-3xl";
+            modalActionBtn.innerText = "Đăng nhập ngay";
+            modalActionBtn.style.display = "block";
+            modalActionBtn.onclick = () => { window.location.href = loginUrl; };
+            
+            // Tự động chuyển hướng sau 3 giây
+            setTimeout(() => { window.location.href = loginUrl; }, 5000);
+        } else {
+            // Cấu hình giao diện LỖI
+            modalIcon.className = "fas fa-exclamation-triangle text-red-600 text-3xl";
+            modalActionBtn.innerText = "Tôi đã hiểu";
+            modalActionBtn.style.display = "block";
+            modalActionBtn.onclick = () => { statusModal.style.display = 'none'; };
+            
+            // Tự động đóng sau 3 giây
+            setTimeout(() => { statusModal.style.display = 'none'; }, 4000);
+        }
+    }
+
+    // Kiểm tra và hiển thị Lỗi
+    if (serverError && serverError !== "null" && serverError.trim() !== "") {
+        openStatusModal(serverError, false);
+    }
+
+    // Kiểm tra và hiển thị Thành công
+    if (serverSuccess && serverSuccess !== "null" && serverSuccess.trim() !== "") {
+        if (elements.submitBtn) elements.submitBtn.style.pointerEvents = 'none';
+        openStatusModal(serverSuccess, true);
+    }
+});
+</script>
+
 </body>
 </html>

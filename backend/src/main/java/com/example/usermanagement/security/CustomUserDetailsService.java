@@ -24,23 +24,25 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String loginInput) throws UsernameNotFoundException {
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy email: " + email));
+        // logic: Tìm bằng Email trước, nếu không thấy thì tìm bằng Số điện thoại
+        User user = userRepository.findByEmail(loginInput)
+                .orElseGet(() -> userRepository.findByPhone(loginInput)
+                .orElseThrow(() -> new UsernameNotFoundException("Tài khoản không tồn tại: " + loginInput)));
 
         // Gom tất cả Role và Permission thành Authorities
         Set<GrantedAuthority> authorities = new HashSet<>();
 
         user.getRoles().forEach(role -> {
-            // 1. Nạp Role (Phải có tiền tố ROLE_ để dùng được .hasRole() trong SecurityConfig)
+            // 1. Thêm Role (VD: ROLE_USER)
             String roleName = role.getName().toUpperCase();
             if (!roleName.startsWith("ROLE_")) {
                 roleName = "ROLE_" + roleName;
             }
             authorities.add(new SimpleGrantedAuthority(roleName));
 
-            // 2. Nạp Permission (Nếu bạn đã có bảng Permission để kiểm soát ads, reports...)
+            // 2. Thêm các quyền Permission cụ thể (VD: READ, WRITE)
             if (role.getPermissions() != null) {
                 role.getPermissions().forEach(p -> {
                     authorities.add(new SimpleGrantedAuthority(p.getName().toUpperCase()));
@@ -49,12 +51,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         });
 
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
+                loginInput, // Dùng chính đầu vào (Email/SĐT) để Spring định danh phiên làm việc
                 user.getPassword(),
                 user.isEnabled(), 
-                true, // accountNonExpired
-                true, // credentialsNonExpired
-                true, // accountNonLocked
+                true, true, true,
                 authorities
         );
     }
