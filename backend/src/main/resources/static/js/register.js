@@ -1,26 +1,40 @@
+/* =========================================================
+   1. PARTICLES.JS CONFIG - Nhẹ & đẹp đỏ chủ đạo
+========================================================= */
 particlesJS("particles-js", {
-    particles: {
-        number: { value: 35 },
-        color: { value: "#b91c1c" },
-        opacity: { value: 0.15 },
-        size: { value: 2 },
-        line_linked: {
-            enable: true,
-            distance: 150,
-            color: "#b91c1c",
-            opacity: 0.1,
-            width: 1
-        },
-        move: { enable: true, speed: 0.8 }
+  "particles": {
+    "number": { "value": 130 },           // nhiều hạt
+    "color": { "value": "#ff3232" },      // đỏ rực
+    "shape": { "type": "circle" },
+    "opacity": { "value": 0.3 },         // sáng hơn
+    "size": { "value": 1.5 },               // to hơn
+    "line_linked": {
+      "enable": true,
+      "distance": 110,                    // nối xa hơn
+      "color": "#ff3232",                 // đỏ rực
+      "opacity": 0.3,                     // đường sáng
+      "width": 1
+    },
+    "move": { "enable": true, "speed": 0.7 } // di chuyển nhanh, mượt
+  },
+  "interactivity": {
+    "events": {
+      "onhover": { "enable": true, "mode": "grab" },
+      "onclick": { "enable": true, "mode": "push" }
     }
+  }
 });
 
+
+
 /* =========================================================
-   2. VARIABLES
+   2. BIẾN TOÀN CỤC
 ========================================================= */
 let isAgeValid = false;
+let isContactAvailable = true; // Theo dõi trạng thái trùng contact
 
 const elements = {
+    form: document.querySelector('form'),
     contact: document.getElementById('contactInput'),
     pass: document.getElementById('password'),
     confirm: document.getElementById('confirm_password'),
@@ -37,6 +51,12 @@ const errors = {
     dob: document.getElementById('dob-error')
 };
 
+const radioGenders = document.querySelectorAll('input[name="gender"]');
+
+/* CSRF Token (Spring Security) */
+const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
 /* =========================================================
    3. UI HELPERS
 ========================================================= */
@@ -48,25 +68,29 @@ function togglePass(id, icon) {
     icon.classList.toggle('fa-eye-slash');
 }
 
-function resetSubmitButton() {
-    if (!elements.submitBtn) return;
-    elements.submitBtn.innerHTML = 'Tạo tài khoản';
-    elements.submitBtn.style.pointerEvents = 'auto';
-}
-
-function toggleInputError(element, errorElement, message, isValid) {
-    if (isValid || element.value === "") {
-        errorElement.classList.add('hidden');
-        element.style.borderColor = "rgba(255,255,255,0.08)";
+function toggleInputError(element, errorEl, message, isValid) {
+    if (isValid || !element.value.trim()) {
+        errorEl.classList.add('hidden');
+        element.style.borderColor = "";
     } else {
-        errorElement.innerText = message;
-        errorElement.classList.remove('hidden');
+        errorEl.textContent = message;
+        errorEl.classList.remove('hidden');
         element.style.borderColor = "#b91c1c";
     }
 }
 
+function updateSubmitButton(isEnabled) {
+    if (isEnabled) {
+        elements.submitBtn.disabled = false;
+        elements.submitBtn.className = "w-full py-4 rounded-2xl bg-red-700 text-white font-bold uppercase text-sm tracking-[0.2em] shadow-lg hover:bg-red-600 active:scale-95 transition-all cursor-pointer";
+    } else {
+        elements.submitBtn.disabled = true;
+        elements.submitBtn.className = "w-full py-4 rounded-2xl bg-gray-600 text-white font-bold uppercase text-sm tracking-[0.2em] opacity-50 cursor-not-allowed";
+    }
+}
+
 /* =========================================================
-   4. STATUS MODAL (GLOBAL)
+   4. MODAL THÔNG BÁO
 ========================================================= */
 function openStatusModal(message, isSuccess = false) {
     const modal = document.getElementById('statusModal');
@@ -77,138 +101,181 @@ function openStatusModal(message, isSuccess = false) {
 
     if (!modal || !msg) return;
 
-    msg.innerText = message;
+    msg.textContent = message;
     modal.style.display = 'flex';
 
     if (isSuccess) {
         icon.className = "fas fa-check-circle text-red-600 text-3xl";
-        btn.innerText = "Đăng nhập ngay";
+        btn.textContent = "Đăng nhập ngay";
         btn.onclick = () => window.location.href = loginUrl;
         setTimeout(() => window.location.href = loginUrl, 5000);
     } else {
         icon.className = "fas fa-exclamation-triangle text-red-600 text-3xl";
-        btn.innerText = "Tôi đã hiểu";
-        btn.onclick = () => {
-            modal.style.display = 'none';
-            resetSubmitButton();
-        };
-        setTimeout(() => modal.style.display = 'none', 5000);
+        btn.textContent = "Tôi đã hiểu";
+        btn.onclick = () => modal.style.display = 'none';
+        setTimeout(() => modal.style.display = 'none', 6000);
     }
 }
 
 /* =========================================================
-   5. REAL-TIME VALIDATION
+   5. REAL-TIME VALIDATION CHI TIẾT
 ========================================================= */
-elements.contact.addEventListener('input', () => {
-    const v = elements.contact.value.trim();
-    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || /^0[35789][0-9]{8}$/.test(v);
-    toggleInputError(elements.contact, errors.contact, "Email hoặc SĐT không hợp lệ", ok);
-});
+function validateAllFields() {
+    let allValid = true;
 
-elements.pass.addEventListener('input', () => {
-    const v = elements.pass.value;
-    const ok = v.length >= 6 && /[a-zA-Z]/.test(v) && /[0-9]/.test(v);
-    toggleInputError(elements.pass, errors.pass, "Mật khẩu cần chữ + số, ≥ 6 ký tự", ok);
-});
+    // 1. Các trường bắt buộc không trống
+    const requiredInputs = elements.form.querySelectorAll('input[required]');
+    requiredInputs.forEach(input => {
+        if (!input.value.trim()) allValid = false;
+    });
 
-elements.confirm.addEventListener('input', () => {
-    toggleInputError(
-        elements.confirm,
-        errors.confirm,
-        "Mật khẩu xác nhận không khớp",
-        elements.confirm.value === elements.pass.value
-    );
-});
+    // 2. Ngày sinh hợp lệ + đủ 16 tuổi
+    const d = parseInt(elements.day.value);
+    const m = parseInt(elements.month.value);
+    const y = parseInt(elements.year.value);
 
-/* =========================================================
-   6. AGE VALIDATION (ĐÃ TỐI ƯU)
-========================================================= */
-[elements.day, elements.month, elements.year].forEach(el => {
-    el.addEventListener('input', () => {
-        const d = +elements.day.value;
-        const m = +elements.month.value - 1;
-        const y = +elements.year.value;
-        
-        // Chỉ validate khi đã nhập đủ 3 trường
-        if (!d || isNaN(m) || !y || y < 1000) return;
+    const monthOk = !isNaN(m) && m >= 1 && m <= 12;
+    const dayOk = !isNaN(d) && d >= 1 && d <= 31;
+    const yearOk = !isNaN(y) && y >= 1900 && y <= new Date().getFullYear();
 
-        const date = new Date(y, m, d);
-        const isValidDate = date.getFullYear() === y && date.getMonth() === m && date.getDate() === d;
+    let dateValid = false;
+    if (monthOk && dayOk && yearOk) {
+        const dateObj = new Date(y, m - 1, d);
+        dateValid = dateObj.getFullYear() === y && dateObj.getMonth() === (m - 1) && dateObj.getDate() === d;
+    }
 
-        if (!isValidDate) {
-            toggleInputError(elements.day, errors.dob, "Ngày sinh không hợp lệ", false);
-            isAgeValid = false;
-            return;
-        }
-
+    if (!monthOk || !dayOk || !yearOk || !dateValid) {
+        allValid = false;
+        isAgeValid = false;
+        toggleInputError(elements.day, errors.dob, "Ngày sinh không hợp lệ", false);
+    } else {
+        // Tính tuổi
         const today = new Date();
         let age = today.getFullYear() - y;
-        const monthDiff = today.getMonth() - m;
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < d)) {
-            age--;
-        }
-
+        if (today.getMonth() < (m - 1) || (today.getMonth() === (m - 1) && today.getDate() < d)) age--;
         isAgeValid = age >= 16;
-        toggleInputError(elements.day, errors.dob, "Bạn phải từ 16 tuổi trở lên", isAgeValid);
-    });
-});
+
+        if (!isAgeValid) {
+            allValid = false;
+            toggleInputError(elements.day, errors.dob, "Bạn phải từ 16 tuổi trở lên", false);
+        } else {
+            errors.dob.classList.add('hidden');
+        }
+    }
+
+    // 3. Giới tính
+    const genderSelected = Array.from(radioGenders).some(r => r.checked);
+    if (!genderSelected) allValid = false;
+
+    // 4. Mật khẩu
+    const passOk = elements.pass.value.length >= 6 && /[a-zA-Z]/.test(elements.pass.value) && /[0-9]/.test(elements.pass.value);
+    toggleInputError(elements.pass, errors.pass, "Mật khẩu cần chữ + số, ≥ 6 ký tự", passOk);
+    if (!passOk) allValid = false;
+
+    // 5. Xác nhận mật khẩu
+    const confirmOk = elements.confirm.value === elements.pass.value && elements.confirm.value !== "";
+    toggleInputError(elements.confirm, errors.confirm, "Mật khẩu xác nhận không khớp", confirmOk);
+    if (!confirmOk) allValid = false;
+
+    // 6. Trạng thái contact (từ AJAX)
+    if (!isContactAvailable) allValid = false;
+
+    // Cập nhật nút submit
+    updateSubmitButton(allValid);
+}
+
+// Gắn lắng nghe toàn form
+elements.form.addEventListener('input', validateAllFields);
+radioGenders.forEach(radio => radio.addEventListener('change', validateAllFields));
+document.addEventListener('DOMContentLoaded', validateAllFields);
 
 /* =========================================================
-   7. FORM SUBMIT
+   6. AUTO FOCUS CHO Ô NGÀY SINH
 ========================================================= */
-function validateForm() {
-    if (!document.querySelector('input[name="gender"]:checked')) {
-        openStatusModal("Vui lòng chọn giới tính của bạn.", false);
-        return false;
-    }
-    if (!isAgeValid) {
-        openStatusModal("Bạn phải đủ 16 tuổi trở lên.", false);
-        return false;
-    }
-
-    elements.submitBtn.innerHTML =
-        '<i class="fas fa-circle-notch fa-spin mr-2"></i> Đang xử lý...';
-    elements.submitBtn.style.pointerEvents = 'none';
-    return true;
-}
 document.querySelectorAll('.dob-field').forEach((input, index, inputs) => {
-    input.addEventListener('input', function() {
-        // 1. Giới hạn số lượng ký tự nhập vào
+    input.addEventListener('input', function () {
         if (this.value.length > this.maxLength) {
             this.value = this.value.slice(0, this.maxLength);
         }
-
-        // 2. Tự động chuyển sang ô tiếp theo khi nhập đủ
-        if (this.value.length === this.maxLength) {
-            const nextInput = inputs[index + 1];
-            if (nextInput) {
-                nextInput.focus();
-            }
+        if (this.value.length === parseInt(this.maxLength)) {
+            const next = inputs[index + 1];
+            if (next) next.focus();
         }
     });
 
-    // 3. (Tùy chọn) Nhấn Backspace khi ô trống thì quay lại ô trước
-    input.addEventListener('keydown', function(e) {
+    input.addEventListener('keydown', function (e) {
         if (e.key === 'Backspace' && this.value.length === 0) {
-            const prevInput = inputs[index - 1];
-            if (prevInput) {
-                prevInput.focus();
-            }
+            const prev = inputs[index - 1];
+            if (prev) prev.focus();
         }
     });
 });
-/* =========================================================
-   8. TỐI ƯU CHUYỂN TRANG (KHỬ DELAY MOBILE)
-========================================================= */
-document.addEventListener('DOMContentLoaded', () => {
-    const loginLink = document.querySelector('a[href*="login"]');
-    
-    if (loginLink) {
-        // Sử dụng event 'touchstart' để phản hồi ngay khi ngón tay vừa chạm vào
-        loginLink.addEventListener('touchstart', function() {
-            this.style.opacity = '0.5';
-        }, {passive: true});
 
-       
+/* =========================================================
+   7. KIỂM TRA TRÙNG EMAIL/SĐT (AJAX)
+========================================================= */
+elements.contact.addEventListener('blur', async () => {
+    const value = elements.contact.value.trim();
+    if (value.length < 6) {
+        isContactAvailable = true;
+        return;
+    }
+
+    // Validate định dạng trước khi gọi API
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    const isPhone = /^0[1-9][0-9]{8}$/.test(value);
+    if (!isEmail && !isPhone) {
+        toggleInputError(elements.contact, errors.contact, "Email hoặc SĐT không hợp lệ", false);
+        isContactAvailable = false;
+        validateAllFields();
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/auth/check-contact?contact=${encodeURIComponent(value)}`, {
+            method: 'GET',
+            headers: csrfHeader ? { [csrfHeader]: csrfToken } : {}
+        });
+
+        if (response.ok) {
+            const exists = await response.json();
+            isContactAvailable = !exists;
+            toggleInputError(elements.contact, errors.contact, "Email hoặc SĐT này đã được sử dụng", !exists);
+        }
+    } catch (err) {
+        console.error("Lỗi kiểm tra trùng:", err);
+        // Không khóa form nếu lỗi mạng
+    } finally {
+        validateAllFields();
     }
 });
+
+/* =========================================================
+   8. FORM SUBMIT CUỐI CÙNG
+========================================================= */
+function validateForm() {
+    validateAllFields(); // Cập nhật lần cuối
+
+    if (elements.submitBtn.disabled) {
+        return false;
+    }
+
+    // Loading state
+    elements.submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Đang xử lý...';
+    elements.submitBtn.disabled = true;
+
+    return true;
+}
+
+/* =========================================================
+   9. TỐI ƯU TOUCH CHO LINK ĐĂNG NHẬP
+========================================================= */
+document.addEventListener('DOMContentLoaded', () => {
+    const loginLink = document.querySelector('a[th\\:href="@{/login}"], a[href*="/login"]');
+    if (loginLink) {
+        loginLink.addEventListener('touchstart', () => loginLink.style.opacity = '0.6', { passive: true });
+        loginLink.addEventListener('touchend', () => loginLink.style.opacity = '1');
+    }
+});
+
+

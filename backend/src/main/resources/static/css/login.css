@@ -27,7 +27,7 @@ body {
   height: 600px;
   background: radial-gradient(
     circle,
-    rgba(185, 28, 28, 0.15) 0%,
+    rgba(185, 28, 28, 0.3) 0%,
     rgba(0, 0, 0, 0) 70%
   );
   border-radius: 50%;
@@ -44,9 +44,9 @@ body {
 }
 
 #loginCard {
-  background: rgba(10, 10, 10, 0.6);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px); /* Hỗ trợ Safari */
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(-100px);
+  -webkit-backdrop-filter: blur(-100px);
   border: 1px solid var(--glass-border);
   border-radius: 2.5rem;
 }
@@ -163,4 +163,11 @@ body {
   #mainContainer {
     padding-bottom: 150px !important;
   }
+}
+/* Chặn chọn và sao chép text toàn site */
+* {
+  -webkit-user-select: none; /* Chrome, Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE/Edge cũ */
+  user-select: none; /* Chuẩn */
 }

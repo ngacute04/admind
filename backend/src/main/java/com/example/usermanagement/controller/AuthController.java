@@ -32,14 +32,12 @@ public class AuthController {
     }
 
     /* ===================== LOGIN ===================== */
-
     @GetMapping("/login")
     public String showLoginPage() {
         return "auth/login";
     }
 
     /* ===================== REGISTER ===================== */
-
     @GetMapping("/register")
     public String showRegisterPage() {
         return "auth/register";
@@ -52,106 +50,89 @@ public class AuthController {
             @RequestParam int dob_month,
             @RequestParam int dob_year,
             @RequestParam String gender,
-            @RequestParam String email,
+            @RequestParam String contact,        // Đổi tên từ email → contact cho rõ nghĩa
             @RequestParam String password,
             RedirectAttributes redirectAttributes
     ) {
-
         try {
-            /* ---------- 1. KIỂM TRA TUỔI (CHUẨN TUYỆT ĐỐI) ---------- */
+            /* ---------- 1. KIỂM TRA NGÀY SINH & TUỔI ---------- */
             LocalDate birthDate = LocalDate.of(dob_year, dob_month, dob_day);
-            LocalDate eligibleDate = birthDate.plusYears(16);
-
-            if (LocalDate.now().isBefore(eligibleDate)) {
-                redirectAttributes.addFlashAttribute(
-                        "errorMessage",
-                        "Yêu cầu hệ thống: Bạn phải đủ 16 tuổi để đăng ký."
-                );
+            if (birthDate.isAfter(LocalDate.now().minusYears(16))) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Yêu cầu hệ thống: Bạn phải đủ 16 tuổi để đăng ký.");
                 return "redirect:/register";
             }
 
-            /* ---------- 2. KIỂM TRA EMAIL / SĐT ---------- */
-            boolean isValidEmail = email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,}$");
-            boolean isValidPhone = email.matches("^0[35789][0-9]{8}$");
+            /* ---------- 2. KIỂM TRA ĐỊNH DẠNG CONTACT ---------- */
+            boolean isEmail = contact.matches("^[\\w.%+-]+@[\\w.-]+\\.[A-Za-z]{2,}$");
+            boolean isPhone = contact.matches("^0[1-9][0-9]{8}$"); // Hỗ trợ tất cả đầu số VN hợp lệ
 
-            if (!isValidEmail && !isValidPhone) {
-                redirectAttributes.addFlashAttribute(
-                        "errorMessage",
-                        "Định dạng Email hoặc Số điện thoại không hợp lệ."
-                );
+            if (!isEmail && !isPhone) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Vui lòng nhập Email hợp lệ hoặc Số điện thoại Việt Nam (10 số).");
                 return "redirect:/register";
             }
 
             /* ---------- 3. KIỂM TRA MẬT KHẨU ---------- */
-            if (password.length() < 6
-                    || !password.matches(".*[a-zA-Z].*")
-                    || !password.matches(".*[0-9].*")) {
-
-                redirectAttributes.addFlashAttribute(
-                        "errorMessage",
-                        "Mật khẩu phải từ 6 ký tự trở lên và bao gồm chữ + số."
-                );
+            if (password.length() < 6 ||
+                !password.matches(".*[a-zA-Z].*") ||
+                !password.matches(".*[0-9].*")) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Mật khẩu phải từ 6 ký tự trở lên, chứa cả chữ cái và số.");
                 return "redirect:/register";
             }
 
-            /* ---------- 4. KIỂM TRA TRÙNG TÀI KHOẢN ---------- */
-            if (isValidEmail && userRepository.findByEmail(email).isPresent()) {
-                redirectAttributes.addFlashAttribute(
-                        "errorMessage",
-                        "Email này đã được sử dụng."
-                );
+            /* ---------- 4. XÁC ĐỊNH EMAIL THỰC & KIỂM TRA TRÙNG ---------- */
+            String finalEmail;
+            if (isPhone) {
+                finalEmail = "phone_" + contact + "@redzone.local"; // Dùng domain nội bộ để tránh conflict thật
+            } else {
+                finalEmail = contact;
+            }
+
+            // Kiểm tra trùng cả email thật lẫn email giả từ SĐT
+            if (userRepository.findByEmail(finalEmail).isPresent()) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        isPhone ? "Số điện thoại này đã được sử dụng." : "Email này đã được sử dụng.");
                 return "redirect:/register";
             }
 
-            if (isValidPhone && userRepository.findByPhone(email).isPresent()) {
-                redirectAttributes.addFlashAttribute(
-                        "errorMessage",
-                        "Số điện thoại này đã được sử dụng."
-                );
+            // Nếu là SĐT, kiểm tra thêm trường phone để tránh trùng SĐT từ user khác
+            if (isPhone && userRepository.findByPhone(contact).isPresent()) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Số điện thoại này đã được sử dụng.");
                 return "redirect:/register";
             }
 
             /* ---------- 5. TẠO USER ---------- */
-            String birthdayStr = String.format("%02d/%02d/%d",
-                    dob_day, dob_month, dob_year);
-
             User user = User.builder()
-                    .fullName(fullName)
+                    .fullName(fullName.trim())
                     .password(passwordEncoder.encode(password))
                     .gender(gender)
-                    .birthday(birthdayStr)
+                    .birthday(String.format("%02d/%02d/%d", dob_day, dob_month, dob_year))
+                    .email(finalEmail)
+                    .phone(isPhone ? contact : null)
                     .enabled(true)
                     .createdAt(LocalDateTime.now())
                     .roles(new HashSet<>())
                     .build();
 
-            if (isValidPhone) {
-                user.setPhone(email);
-                user.setEmail("phone_" + email + "@redzone.com");
-            } else {
-                user.setEmail(email);
-            }
-
             Role roleUser = roleRepository.findByName("ROLE_USER")
-                    .orElseThrow(() ->
-                            new RuntimeException("ROLE_USER chưa được khởi tạo"));
+                    .orElseThrow(() -> new RuntimeException("Error: ROLE_USER not found in database."));
 
             user.addRole(roleUser);
             userRepository.save(user);
 
             /* ---------- 6. THÀNH CÔNG ---------- */
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Đăng ký thành công! Hệ thống sẽ chuyển bạn sang trang đăng nhập."
-            );
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Chúc mừng! Tài khoản đã được tạo thành công. Bạn có thể đăng nhập ngay bây giờ.");
 
-            return "redirect:/register";
+            return "redirect:/login"; // ← QUAN TRỌNG: Chuyển sang trang login
 
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    "Ngày sinh không hợp lệ hoặc lỗi hệ thống."
-            );
+            // Bao gồm cả DateTimeException nếu ngày không hợp lệ (30/2, etc.)
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Ngày sinh không hợp lệ hoặc có lỗi hệ thống. Vui lòng thử lại.");
             return "redirect:/register";
         }
     }

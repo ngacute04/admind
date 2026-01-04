@@ -42,13 +42,17 @@
                     </div>
                 </div>
 
-                <div class="flex items-start gap-4">
-                    <i class="fas fa-gift text-red-500 mt-1 text-xl"></i>
-                    <div>
-                        <h4 class="font-bold text-gray-200">Phần thưởng độc quyền</h4>
-                        <p class="text-sm text-gray-400">Đăng ký ngay hôm nay để nhận huy hiệu "Thành viên tiên phong" và nhiều ưu đãi hấp dẫn.</p>
-                    </div>
-                </div>
+              <div class="flex items-start gap-4">
+  <i class="fas fa-play text-red-500 mt-1 text-xl"></i>
+  <div>
+    <h4 class="font-bold text-gray-200">Vào là dùng được ngay</h4>
+    <p class="text-sm text-gray-400">
+      Không cần học cách sử dụng. Mọi thao tác đều trực quan và dễ hiểu.
+    </p>
+  </div>
+</div>
+
+
             </div>
 
             <div class="mt-10 flex items-center gap-4">
@@ -69,18 +73,18 @@
                 <p class="text-gray-500 text-[9px] uppercase tracking-[4px] mt-1">Bước vào thế giới của bạn</p>
             </div>
 
-            <div id="loginCard" class="w-full max-w-md p-8 md:p-10 relative">
-                
-                <div id="loginError" th:if="${param.error}" class="show">
-                    <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
-                    <span class="text-xs font-bold tracking-wide uppercase">Tài khoản hoặc mật khẩu không đúng</span>
-                </div>
-                <div class="text-center mb-8">
-                    <h3 class="text-xl md:text-2xl font-bold tracking-normal uppercase">Đăng Nhập</h3>
-                    <div class="h-1 w-8 bg-red-600 mx-auto rounded-full mt-3"></div>
-                </div>
+                    <div id="loginCard" class="w-full max-w-md p-8 md:p-10 relative">
+                        
+                        <div id="loginError" th:if="${param.error}" class="show">
+                            <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
+                            <span class="text-xs font-bold tracking-wide uppercase">Tài khoản hoặc mật khẩu không đúng</span>
+                        </div>
+                        <div class="text-center mb-8">
+                            <h3 class="text-xl md:text-2xl font-bold tracking-normal uppercase">Đăng Nhập</h3>
+                            <div class="h-1 w-8 bg-red-600 mx-auto rounded-full mt-4"></div>
+                        </div>
 
-                <form id="loginForm" method="POST" th:action="@{/login}" class="space-y-5">
+                        <form id="loginForm" method="POST" th:action="@{/login}" class="space-y-5">
                     <div class="input-group">
                         <div class="relative">
                             <i class="fas fa-user-circle absolute left-4 top-1/2 -translate-y-1/2 text-gray-600"></i>
@@ -100,7 +104,7 @@
                     </div>
 
                     <button type="submit"
-                            class="w-full py-4 rounded-2xl bg-red-700 text-white font-bold uppercase tracking-[0.2em] text-xs shadow-2xl shadow-red-900/40 hover:bg-red-600 transition-all active:scale-[0.98]">
+                            class="w-full py-5 rounded-2xl bg-red-700 text-white font-bold uppercase tracking-[0.2em] text-xs shadow-2xl shadow-red-900/40 hover:bg-red-600 transition-all active:scale-[0.98]">
                         Đăng nhập
                     </button>
 
@@ -129,17 +133,31 @@
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
-        particlesJS("particles-js", {
-            "particles": {
-                "number": { "value": 40 }, /* Giảm bớt để mượt hơn trên mobile */
-                "color": { "value": "#b91c1c" },
-                "shape": { "type": "circle" },
-                "opacity": { "value": 0.2 },
-                "size": { "value": 2 },
-                "line_linked": { "enable": true, "distance": 150, "color": "#b91c1c", "opacity": 0.1, "width": 1 },
-                "move": { "enable": true, "speed": 1 }
-            }
-        });
+particlesJS("particles-js", {
+  "particles": {
+    "number": { "value": 130 },           // nhiều hạt
+    "color": { "value": "#ff3232" },      // đỏ rực
+    "shape": { "type": "circle" },
+    "opacity": { "value": 0.3 },         // sáng hơn
+    "size": { "value": 1.5 },               // to hơn
+    "line_linked": {
+      "enable": true,
+      "distance": 110,                    // nối xa hơn
+      "color": "#ff3232",                 // đỏ rực
+      "opacity": 0.3,                     // đường sáng
+      "width": 1
+    },
+    "move": { "enable": true, "speed": 0.7 } // di chuyển nhanh, mượt
+  },
+  "interactivity": {
+    "events": {
+      "onhover": { "enable": true, "mode": "grab" },
+      "onclick": { "enable": true, "mode": "push" }
+    }
+  }
+});
+
+
 
         document.addEventListener("DOMContentLoaded", () => {
             const errorBox = document.getElementById("loginError");

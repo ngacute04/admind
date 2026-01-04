@@ -17,13 +17,14 @@ body {
   height: 100%;
   z-index: -1;
 }
+
 .bg-glow {
   position: fixed;
   width: 600px;
   height: 600px;
   background: radial-gradient(
     circle,
-    rgba(185, 28, 28, 0.15) 0%,
+    rgba(185, 28, 28, 0.3) 0%,
     rgba(0, 0, 0, 0) 70%
   );
   border-radius: 50%;
@@ -45,9 +46,9 @@ body {
 }
 
 #registerCard {
-  background: rgba(10, 10, 10, 0.65);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(-100px);
+  -webkit-backdrop-filter: blur(-100px);
   border: 1px solid var(--glass-border);
   border-radius: 2.5rem;
   width: 100%;
@@ -330,4 +331,17 @@ main {
   display: flex;
   align-items: center; /* Căn giữa form trên màn hình */
   justify-content: center;
+}
+#submitBtn:disabled {
+  background-color: #4b5563 !important; /* Gray-600 */
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important; /* Bỏ hiệu ứng scale khi click */
+}
+/* Chặn chọn và sao chép text toàn site */
+* {
+  -webkit-user-select: none; /* Chrome, Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE/Edge cũ */
+  user-select: none; /* Chuẩn */
 }
