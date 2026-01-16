@@ -1,23 +1,111 @@
+server:
+  port: 8080
+
 spring:
+  application:
+    name: user-management
+
+  # ===============================
+  # DATASOURCE (PostgreSQL)
+  # ===============================
   datasource:
     url: jdbc:postgresql://localhost:5432/nguyenvannga
     username: nguyenvannga
-    password: "" # Thêm cặp nháy kép nếu mật khẩu trống
     driver-class-name: org.postgresql.Driver
 
+  # ===============================
+  # JPA / HIBERNATE
+  # ===============================
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+    open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
 
+  # ===============================
+  # THYMELEAF
+  # ===============================
   thymeleaf:
     cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
 
+  # ===============================
+  # CACHE
+  # ===============================
+  cache:
+    type: redis
+
+  # ===============================
+  # REDIS
+  # ===============================
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+
+  # ===============================
+  # RABBITMQ (AMQP)
+  # ===============================
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+
+  # ===============================
+  # MAIL (DEV – KHÔNG GỬI THẬT)
+  # ===============================
+  mail:
+    host: localhost
+    port: 1025
+    username: ""
+    password: ""
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+  # ===============================
+  # FLYWAY
+  # ===============================
+  flyway:
+    enabled: false # bật khi có migration thật
+    baseline-on-migrate: true
+
+  # ===============================
+  # DEVTOOLS
+  # ===============================
   devtools:
     restart:
-      enabled: true
-    livereload:
-      enabled: true
+      enabled: false
+
+# ===============================
+# ACTUATOR
+# ===============================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# ===============================
+# LOGGING
+# ===============================
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
